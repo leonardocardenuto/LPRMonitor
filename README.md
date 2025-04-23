@@ -15,8 +15,8 @@ Este projeto é um sistema de **reconhecimento de placas de veículos** usando i
 
 ### 1. Clonar o Repositório
 ```bash
-git clone https://github.com/seu-usuario/license_plate_recognition.git
-cd license_plate_recognition
+git clone https://github.com/leonardocardenuto/LPRMonitor.git
+cd LPRMonitor
 ```
 > Nota: Certificar-se de ter configurado o arquivo .env como especificado no .env.example.
 
