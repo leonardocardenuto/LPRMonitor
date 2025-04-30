@@ -7,8 +7,7 @@ export default function App() {
           <div className="text-xl font-bold">Meu App</div>
           <div className="space-x-4">
             <a href="#" className="hover:underline">Home</a>
-            <a href="#" className="hover:underline">Sobre</a>
-            <a href="#" className="hover:underline">Contato</a>
+
           </div>
         </nav>
   
