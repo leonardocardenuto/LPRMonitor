@@ -6,7 +6,6 @@ const App: React.FC = () => {
   return (
     <>
       <NavBar />
-      <main className="p-4">Conteúdo principal</main>
     </>
   );
 };

@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
+import { FaHome, FaInfoCircle, FaContao } from 'react-icons/fa'; // Ícones
 
 const NavBar: React.FC = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false); // Controle de expansão do menu
 
   return (
-    <header className="bg-blue-600 text-white p-4">
-      <div className="container mx-auto flex items-center justify-between">
-        {/* Botão hambúrguer */}
+    <div className="flex h-screen">
+      {/* Barra Lateral */}
+      <div
+        className={`bg-blue-600 text-white p-4 space-y-6 align-middle top-0 h-full transition-all duration-300 ${
+          menuOpen ? 'w-50' : 'w-20'
+        }`} // Largura variando com base no estado menuOpen
+      >
+        {/* Botão Hambúrguer */}
         <button
-          className="lg:hidden"
-          onClick={() => setMenuOpen(!menuOpen)}
+          className="text-white"
+          onClick={() => setMenuOpen(!menuOpen)} // Controla a expansão
           aria-label="Abrir menu"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -17,26 +23,23 @@ const NavBar: React.FC = () => {
           </svg>
         </button>
 
-        {/* Texto central */}
-        <h1 className="text-lg font-semibold mx-auto lg:mx-0">Minha Aplicação</h1>
-
-        {/* Menu Desktop (escondido em mobile) */}
-        <nav className="hidden lg:flex gap-4">
-          <a href="#" className="hover:underline">Item 1</a>
-          <a href="#" className="hover:underline">Item 2</a>
-          <a href="#" className="hover:underline">Item 3</a>
-        </nav>
-      </div>
-
-      {/* Menu Mobile */}
-      {menuOpen && (
-        <div className="lg:hidden mt-2 space-y-2 text-center">
-          <a href="#" className="block">Item 1</a>
-          <a href="#" className="block">Item 2</a>
-          <a href="#" className="block">Item 3</a>
+        {/* Ícones e Nomes */}
+        <div className="space-y-4">
+          <div className="flex items-center space-x-4">
+            <FaHome className="w-6 h-6" />
+            {menuOpen && <span>Início</span>} {/* Nomes aparecem quando menu está aberto */}
+          </div>
+          <div className="flex items-center space-x-4">
+            <FaInfoCircle className="w-6 h-6" />
+            {menuOpen && <span>Sobre</span>}
+          </div>
+          <div className="flex items-center space-x-4">
+            <FaContao className="w-6 h-6" />
+            {menuOpen && <span>Contato</span>}
+          </div>
         </div>
-      )}
-    </header>
+      </div>
+    </div>
   );
 };
 
