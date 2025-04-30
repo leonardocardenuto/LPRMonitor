@@ -33,7 +33,16 @@ module.exports = [
     test: /\.css$/,
     include: [path.resolve(__dirname, "app/src")],
     use: ["style-loader", "css-loader", "postcss-loader"],
-  }
+  },
+  {
+    test: /\.tsx?$/,
+    use: 'ts-loader',
+    exclude: /node_modules/,
+    resolve: {
+      extensions: ['.tsx', '.ts', '.js']
+    }
+  },
+
   // Put your webpack loader rules in this array.  This is where you would put
   // your ts-loader configuration for instance:
   /**
