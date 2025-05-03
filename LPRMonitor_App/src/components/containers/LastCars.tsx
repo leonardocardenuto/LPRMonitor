@@ -1,13 +1,13 @@
 import React from 'react';
 
-interface CameraProps {
+interface LastCarsProps {
     imageSrc?: string;
     altText?: string;
 }
 
-const Camera: React.FC<CameraProps> = ({ imageSrc, altText = 'Camera feed' }) => {
+const LastCars: React.FC<LastCarsProps> = ({ imageSrc, altText = 'Camera feed' }) => {
     return (
-        <div className="absolute top-0 left-0 w-1/2 h-1/2 bg-white flex justify-center items-center">
+        <div className="absolute top-0 right-0 w-1/3 h-1/2 bg-white flex justify-center items-center">
             {imageSrc ? (
                 <img src={imageSrc} alt={altText} className="max-w-full max-h-full" />
             ) : (
@@ -17,4 +17,4 @@ const Camera: React.FC<CameraProps> = ({ imageSrc, altText = 'Camera feed' }) =>
     );
 };
 
-export default Camera;
+export default LastCars;

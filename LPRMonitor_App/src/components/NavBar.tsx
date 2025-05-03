@@ -1,42 +1,80 @@
 import React, { useState } from 'react';
-import { FaHome, FaInfoCircle, FaContao } from 'react-icons/fa'; // Ícones
+import { FaAd, FaCannabis, FaHome, FaInfoCircle } from 'react-icons/fa';
 
 const NavBar: React.FC = () => {
-  const [menuOpen, setMenuOpen] = useState(false); // Controle de expansão do menu
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div className="flex h-screen">
-      {/* Barra Lateral */}
+      {/* Sidebar */}
       <div
-        className={`bg-blue-600 text-white p-4 space-y-6 align-middle top-0 h-full transition-all duration-300 ${
-          menuOpen ? 'w-50' : 'w-20'
-        }`} // Largura variando com base no estado menuOpen
+        className={`bg-[#272932] text-white p-4 space-y-6 align-middle top-0 h-full transition-all duration-500 ease-in-out ${
+          menuOpen ? 'w-48' : 'w-20'
+        } overflow-hidden`}
       >
-        {/* Botão Hambúrguer */}
         <button
-          className="text-white"
-          onClick={() => setMenuOpen(!menuOpen)} // Controla a expansão
-          aria-label="Abrir menu"
+          className="relative w-8 h-8 flex items-center justify-center focus:outline-none"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle Menu"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
+          {/* Linha 1 */}
+          <span
+            className={`absolute w-6 h-0.5 bg-white transition-transform duration-500 ease-in-out ${
+              menuOpen ? 'rotate-45' : '-translate-y-2'
+            }`}
+          />
+          {/* Linha 2 */}
+          <span
+            className={`absolute w-6 h-0.5 bg-white transition-opacity duration-500 ease-in-out ${
+              menuOpen ? 'opacity-0' : 'opacity-100'
+            }`}
+          />
+          {/* Linha 3 */}
+          <span
+            className={`absolute w-6 h-0.5 bg-white transition-transform duration-500 ease-in-out ${
+              menuOpen ? '-rotate-45' : 'translate-y-2'
+            }`}
+          />
         </button>
 
         {/* Ícones e Nomes */}
-        <div className="space-y-4">
-          <div className="flex items-center space-x-4">
-            <FaHome className="w-6 h-6" />
-            {menuOpen && <span>Início</span>} {/* Nomes aparecem quando menu está aberto */}
-          </div>
-          <div className="flex items-center space-x-4">
-            <FaInfoCircle className="w-6 h-6" />
-            {menuOpen && <span>Sobre</span>}
-          </div>
-          <div className="flex items-center space-x-4">
-            <FaContao className="w-6 h-6" />
-            {menuOpen && <span>Contato</span>}
-          </div>
+        <div className="space-y-6">
+          <button>
+            <div className="flex items-center space-x-4">
+              <FaHome className="w-8 h-8" />
+              <span
+                className={`transition-opacity duration-300 font-bold ${
+                  menuOpen ? 'opacity-100' : 'opacity-0'
+                }`}
+              >
+                Home
+              </span>
+            </div>
+          </button>
+          <button>
+            <div className="flex items-center space-x-4">
+              <FaInfoCircle className="w-8 h-8" />
+              <span
+                className={`transition-opacity duration-300 font-bold ${
+                  menuOpen ? 'opacity-100' : 'opacity-0'
+                }`}
+              >
+                Informações
+              </span>
+            </div>
+          </button>
+          <button>
+            <div className="flex items-center space-x-4">
+              <FaCannabis className="w-8 h-8" />
+              <span
+                className={`transition-opacity duration-300 font-bold ${
+                  menuOpen ? 'opacity-100' : 'opacity-0'
+                }`}
+              >
+                Usuário
+              </span>
+            </div>
+          </button>
         </div>
       </div>
     </div>
