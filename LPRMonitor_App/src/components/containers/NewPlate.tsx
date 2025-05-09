@@ -6,7 +6,7 @@ import brasil from '../../assets/brasil.png';
 const NewPlate: React.FC = () => {
     {/* Adicionar requisição de leitura de nova Placa*/}
     const [newPlate] = React.useState<string>('SVU-2G24');
-    const [cadastrada] = useState<boolean>(false);
+    const [cadastrada] = useState<boolean>(true);
 
     return (
         <div className="absolute bottom-0 left-0 w-1/2 h-2/5 bg-white flex flex-col justify-evenly">
