@@ -9,7 +9,7 @@ Este projeto é um sistema de **reconhecimento de placas de veículos** usando i
 - **Frontend:** ReactJS, Typescript
 - **Banco de Dados:** NeonDB (compatível com PostgreSQL)
 - **Inteligência Artificial:** YOLO (detecção de objetos) e OCR (reconhecimento de texto)
-- **Ferramentas:** GitHub, Trello, Postman, Figma
+- **Ferramentas:** GitHub, Trello, Postman, Figma, Roboflow, CVAT
 
 ## Como Rodar o Projeto
 
