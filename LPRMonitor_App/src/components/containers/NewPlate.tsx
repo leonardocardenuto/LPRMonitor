@@ -5,8 +5,25 @@ import brasil from '../../assets/brasil.png';
 
 const NewPlate: React.FC = () => {
     {/* Adicionar requisição de leitura de nova Placa*/}
-    const [newPlate] = React.useState<string>('SVU-2G24');
-    const [cadastrada] = useState<boolean>(true);
+    let newPlate: string = ""; 
+    let cadastrada: boolean = false;
+
+    const checkPlateRegistration = async (plate: string) => {
+        try {
+            const response = await fetch(`/api/checkPlate?plate=${newPlate}`);
+            const data = await response.json();
+            cadastrada = data.isRegistered;
+        } catch (error) {
+            console.error("Error checking plate registration:", error);
+            cadastrada = false;
+        }
+    };
+
+
+    useState(() => {
+        newPlate = "ABC1234"; // Replace with actual plate value
+        checkPlateRegistration(newPlate);
+    });
 
     return (
         <div className="absolute bottom-0 left-0 w-1/2 h-2/5 bg-white flex flex-col justify-evenly">
