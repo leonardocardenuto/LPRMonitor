@@ -37,3 +37,25 @@ chmod +x ./lpr
 ```bash
 ./lpr run
 ```
+
+### ⚠️  
+### Para testar o modelo:
+#### • Crie e ative um ambiente virtual
+```bash
+python -m venv venv
+venv/Scripts/activate  # No Windows
+```
+#### ou
+```bash
+source venv/bin/activate  # No Linux/macOS
+```
+
+#### • Instale as dependências necessárias
+```bash
+pip install ultralytics
+```
+
+#### • Execute o script de teste
+```bash
+python test.py
+```
