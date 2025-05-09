@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { FaAd, FaCannabis, FaHome, FaInfoCircle } from 'react-icons/fa';
+import logo from '../assets/logo_white.png';
+import { motion }from "framer-motion";
 
 const NavBar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -13,7 +15,7 @@ const NavBar: React.FC = () => {
         } overflow-hidden`}
       >
         <button
-          className="relative w-8 h-8 flex items-center justify-center focus:outline-none"
+          className="relative w-8 h-8 flex items-center ml-2 justify-center focus:outline-none"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle Menu"
         >
@@ -38,44 +40,51 @@ const NavBar: React.FC = () => {
         </button>
 
         {/* Ícones e Nomes */}
-        <div className="space-y-6">
-          <button>
-            <div className="flex items-center space-x-4">
-              <FaHome className="w-8 h-8" />
-              <span
-                className={`transition-opacity duration-300 font-bold ${
-                  menuOpen ? 'opacity-100' : 'opacity-0'
-                }`}
-              >
-                Home
-              </span>
+          <div className='flex flex-col justify-between h-auto'>
+            <div className="space-y-6 ml-2 ">
+              <button>
+                <div className="flex items-center space-x-4">
+                  <FaHome className="w-8 h-8" />
+                  <span
+                    className={`transition-opacity duration-300 font-bold ${
+                      menuOpen ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  >
+                    Home
+                  </span>
+                </div>
+              </button>
+              <button>
+                <div className="flex items-center space-x-4">
+                  <FaInfoCircle className="w-8 h-8" />
+                  <span
+                    className={`transition-opacity duration-300 font-bold ${
+                      menuOpen ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  >
+                    Informações
+                  </span>
+                </div>
+              </button>
+              <button>
+                <div className="flex items-center space-x-4">
+                  <FaCannabis className="w-8 h-8" />
+                  <span
+                    className={`transition-opacity duration-300 font-bold ${
+                      menuOpen ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  >
+                    Usuário
+                  </span>
+                </div>
+              </button>
             </div>
-          </button>
-          <button>
-            <div className="flex items-center space-x-4">
-              <FaInfoCircle className="w-8 h-8" />
-              <span
-                className={`transition-opacity duration-300 font-bold ${
-                  menuOpen ? 'opacity-100' : 'opacity-0'
-                }`}
-              >
-                Informações
-              </span>
+            <div className={`flex items-center space-x-4 mt-10 ${menuOpen ? 'ml-16' : 'ml-0'}`}>
+              <motion.img src={logo} animate={{rotate:360}} transition={{duration: 1}} className="w-12 h-12"/>
             </div>
-          </button>
-          <button>
-            <div className="flex items-center space-x-4">
-              <FaCannabis className="w-8 h-8" />
-              <span
-                className={`transition-opacity duration-300 font-bold ${
-                  menuOpen ? 'opacity-100' : 'opacity-0'
-                }`}
-              >
-                Usuário
-              </span>
-            </div>
-          </button>
-        </div>
+          </div>
+
+
       </div>
     </div>
   );

@@ -28,7 +28,7 @@ const App: React.FC = () => {
             <div>
               <NewPlateProps />
             </div>
-            <div className="absolute bottom-0 right-0 bg-white text-[black] p-6 w-1/3">
+            <div className="absolute bottom-0 right-0 bg-white text-[black] p-6 w-5/12">
               nao salve
             </div>
 
