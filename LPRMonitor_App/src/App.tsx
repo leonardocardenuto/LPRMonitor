@@ -4,6 +4,7 @@ import Camera from './components/containers/Camera';
 import NewPlateProps from './components/containers/NewPlate';
 import LastCars from './components/containers/LastCars';
 import LPR_Monitor_logo from './assets/LPR_Monitor_logo.png';
+import UnauthorizedCarsTable from './components/containers/UnauthorizedCars/UnauthorizedCars';
 
 
 const App: React.FC = () => {
@@ -14,23 +15,18 @@ const App: React.FC = () => {
       <NavBar />
       <div className="flex-1 m-8 relative">
         {/* Div do container que vai os 4 quadrados personalizaveis*/}
-
-
-            <div>
-              <Camera />
-            </div>
-            <div>
-              <LastCars />
-            </div>
-
-
-
-            <div>
-              <NewPlateProps />
-            </div>
-            <div className="absolute bottom-0 right-0 bg-white text-[black] p-6 w-5/12">
-              nao salve
-            </div>
+        <div>
+          <Camera />
+        </div>
+        <div>
+          <LastCars />
+        </div>
+        <div>
+          <NewPlateProps />  
+        </div>
+        <div>
+          <UnauthorizedCarsTable />
+        </div>
 
 
 
