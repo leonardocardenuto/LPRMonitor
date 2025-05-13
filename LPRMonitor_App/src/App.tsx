@@ -2,7 +2,7 @@ import React from 'react';
 import NavBar from './components/NavBar';
 import Camera from './components/containers/Camera';
 import NewPlateProps from './components/containers/NewPlate';
-import LastCars from './components/containers/LastCars';
+import LastCars from './components/containers/LastCars/LastCars';
 import LPR_Monitor_logo from './assets/LPR_Monitor_logo.png';
 import UnauthorizedCarsTable from './components/containers/UnauthorizedCars/UnauthorizedCars';
 

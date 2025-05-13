@@ -68,6 +68,9 @@ const UnauthorizedCarsTable: React.FC = () => {
 
     return (
         <div className="absolute bottom-0 right-0 w-5/12 h-2/5 bg-white shadow-xl rounded-2xl overflow-hidden">
+            <div className="p-4 border-b bg-gray-100 text-center">
+                <h2 className="text-lg font-semibold text-gray-800">Últimos Carros Não Autorizados</h2>
+            </div>
             <div className="h-full overflow-auto">
                 {loading ? (
                     <div className="flex justify-center items-center h-full">
