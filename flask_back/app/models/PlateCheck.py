@@ -8,6 +8,14 @@ class PlateCheck(db.Model):
     license_plate = db.Column(db.String, nullable=False)
     description = db.Column(db.String)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "license_plate": self.license_plate,
+            "description": self.description,
+            "created_at": self.created_at.isoformat()
+        }
 
     def __repr__(self):
         return f"<CarTemp id={self.id} license_plate='{self.license_plate}'>"

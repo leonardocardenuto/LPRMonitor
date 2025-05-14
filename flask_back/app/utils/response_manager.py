@@ -30,3 +30,11 @@ class ResponseManager:
     @staticmethod
     def not_found(message="Not Found"):
         return jsonify({"msg": message}), 404
+
+    @staticmethod
+    def internal_server_error(message="Internal Server Error"):
+        return jsonify({"msg": message}), 500
+
+    @staticmethod
+    def with_code(code: int, message=""):
+        return jsonify({"msg": message}), code

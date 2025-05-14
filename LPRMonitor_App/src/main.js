@@ -17,7 +17,19 @@ const createWindow = () => {
     icon: path.join(__dirname, 'assets/LPRMonitor_Icon.ico'),
     autoHideMenuBar: true,
   });
-
+  
+  mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [
+          "default-src 'self' data: 'unsafe-inline' 'unsafe-eval'; connect-src 'self' http://localhost:5000 ws://localhost:3000"
+        ]
+      }
+    });
+  });
+  
+  
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
