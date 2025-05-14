@@ -3,8 +3,6 @@ from ultralytics import YOLO
 import re
 from tkinter import Tk, filedialog
 
-# --------------------- Funções Auxiliares ---------------------
-
 def selecionar_video():
     root = Tk()
     root.withdraw()
@@ -43,11 +41,10 @@ def validar_formato(texto, classe):
         return re.fullmatch(r'[A-Z]{3}[0-9][A-Z][0-9]{2}', texto)
     return False
 
-# --------------------- Carregar Modelos ---------------------
-placa_model = YOLO('best.pt')                # Detecção de placa
-caracteres_model = YOLO('character_detection.pt')     # Detecção de caracteres
 
-# --------------------- Selecionar vídeo ---------------------
+placa_model = YOLO('best.pt')                
+caracteres_model = YOLO('character_detection.pt')     
+
 video_path = selecionar_video()
 if not video_path:
     print("Nenhum vídeo selecionado. Saindo...")
@@ -55,7 +52,6 @@ if not video_path:
 
 cap = cv2.VideoCapture(video_path)
 
-# --------------------- Processamento do Vídeo ---------------------
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
@@ -63,7 +59,6 @@ while cap.isOpened():
 
     frame = cv2.resize(frame, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
 
-    # Detecção das placas no frame
     placas_result = placa_model(frame)
 
     for r in placas_result:
@@ -75,12 +70,10 @@ while cap.isOpened():
             x1, y1, x2, y2 = map(int, box)
             class_name = placa_model.model.names[int(cls_idx)]
 
-            # Recorte da placa
             placa_crop = frame[y1:y2, x1:x2]
             if placa_crop.size == 0:
                 continue
 
-            # Detecção dos caracteres dentro da placa
             caracteres_result = caracteres_model(placa_crop)[0]
 
             caracteres_detectados = []
@@ -94,30 +87,31 @@ while cap.isOpened():
                     'score': score
                 })
 
-            # Ordenar da esquerda para a direita
             caracteres_ordenados = sorted(caracteres_detectados, key=lambda c: c['x1'])
 
-            # Montar texto final
+        
             placa_texto = corrigir_formato(''.join([c['label'] for c in caracteres_ordenados]), class_name)
 
-            # Validação do formato
-            # Validação do formato e da confiança dos caracteres
             todas_confiancas_validas = all(c['score'] >= 0.7 for c in caracteres_ordenados)
-            confianca = min(c["score"] for c in caracteres_ordenados)
+            
+            confianca = 0
+            if caracteres_ordenados:
+                confianca = min(c["score"] for c in caracteres_ordenados)
+        
 
             if validar_formato(placa_texto, class_name) and todas_confiancas_validas:
                 print(f'[VALIDO] Classe: {class_name} | Placa: {placa_texto} | Confiança mínima: {confianca}')
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
-                cv2.putText(frame, f'{class_name}: {placa_texto}', (x1, y1 - 10),
+                cv2.putText(frame, f'{class_name}: {placa_texto}', (x1, y1 - 35),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
-                cv2.putText(frame, f'CONFIANCA: {(confianca*100):.2f}%', (x1, y1 + 60),
+                cv2.putText(frame, f'CONFIANCA: {(confianca*100):.2f}%', (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
             else:
                 print(f'[INVALIDO] Classe: {class_name} | Texto: {placa_texto} | Confianças: {[round(c["score"], 2) for c in caracteres_ordenados]}')
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), 2)
-                cv2.putText(frame, f'INVALIDO: {placa_texto}', (x1, y1 - 10),
+                cv2.putText(frame, f'INVALIDO: {placa_texto}', (x1, y1 - 35),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                cv2.putText(frame, f'CONFIANCA: {(confianca*100):.2f}%', (x1, y1 + 60),
+                cv2.putText(frame, f'CONFIANCA: {(confianca*100):.2f}%', (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
 
