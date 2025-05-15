@@ -69,7 +69,7 @@ const LastCarsTable: React.FC = () => {
     });
 
   return (
-    <div className="absolute top-0 right-0 w-5/12 h-2/5 bg-white shadow-xl rounded-2xl overflow-hidden">
+    <div className="absolute top-0 right-0 w-5/12 h-1/2 bg-white shadow-xl rounded-2xl overflow-hidden">
       <div className="p-4 border-b bg-gray-100 text-center">
         <h2 className="text-lg font-semibold text-gray-800">Últimos Carros</h2>
       </div>

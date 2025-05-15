@@ -3,7 +3,11 @@ import { FaAd, FaCannabis, FaCar, FaHome, FaInfoCircle } from 'react-icons/fa';
 import logo from '../assets/logo_white.png';
 import { motion }from "framer-motion";
 
-const NavBar: React.FC = () => {
+interface NavBarProps {
+  onLogout: () => void;
+} 
+
+const NavBar: React.FC <NavBarProps> = ({ onLogout }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -82,6 +86,9 @@ const NavBar: React.FC = () => {
             <div className={`flex items-center space-x-4 mt-10 ${menuOpen ? 'ml-16' : 'ml-0'}`}>
               <motion.img src={logo} animate={{rotate:360}} transition={{duration: 1}} className="w-12 h-12"/>
             </div>
+              <button onClick={onLogout} className="w-full bg-red-600 hover:bg-red-700 text-white p-2 rounded mt-4">
+                Sair
+              </button>
           </div>
 
 
