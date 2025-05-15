@@ -52,10 +52,18 @@ if not video_path:
 
 cap = cv2.VideoCapture(video_path)
 
+placas_diferentes = set()
+
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
         break
+
+    #Processando apenas frames multiplos de 4 para melhorar eficiencia
+    frame_id = int(cap.get(cv2.CAP_PROP_POS_FRAMES)) - 1 
+
+    if frame_id % 4 != 0:
+        continue
 
     frame = cv2.resize(frame, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
 
@@ -89,15 +97,13 @@ while cap.isOpened():
 
             caracteres_ordenados = sorted(caracteres_detectados, key=lambda c: c['x1'])
 
-        
             placa_texto = corrigir_formato(''.join([c['label'] for c in caracteres_ordenados]), class_name)
 
             todas_confiancas_validas = all(c['score'] >= 0.7 for c in caracteres_ordenados)
-            
+
             confianca = 0
             if caracteres_ordenados:
                 confianca = min(c["score"] for c in caracteres_ordenados)
-        
 
             if validar_formato(placa_texto, class_name) and todas_confiancas_validas:
                 print(f'[VALIDO] Classe: {class_name} | Placa: {placa_texto} | Confiança mínima: {confianca}')
@@ -106,19 +112,21 @@ while cap.isOpened():
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
                 cv2.putText(frame, f'CONFIANCA: {(confianca*100):.2f}%', (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
+                placas_diferentes.add(placa_texto)
+
             else:
-                print(f'[INVALIDO] Classe: {class_name} | Texto: {placa_texto} | Confianças: {[round(c["score"], 2) for c in caracteres_ordenados]}')
+                print(f'[INVALIDO] Classe: {class_name} | Texto: {placa_texto} | Confiancas: {[round(c["score"], 2) for c in caracteres_ordenados]}')
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), 2)
                 cv2.putText(frame, f'INVALIDO: {placa_texto}', (x1, y1 - 35),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 cv2.putText(frame, f'CONFIANCA: {(confianca*100):.2f}%', (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-
     cv2.imshow('Detecção de Placas', frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
+print(f'\nPlacas diferentes detectadas: {", ".join(placas_diferentes)}')
 cap.release()
 cv2.destroyAllWindows()
