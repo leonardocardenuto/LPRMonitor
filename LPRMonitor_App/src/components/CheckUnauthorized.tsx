@@ -1,16 +1,12 @@
 import React from 'react';
 import ProtectedLayout from '../components/ProtectedLayout';
-
-import Camera from './HomeContainers/Camera';
-import NewPlate from './HomeContainers/NewPlate/NewPlate';
-import LastCars from './HomeContainers/LastCars/LastCars';
 import UnauthorizedCarsTable from './HomeContainers/UnauthorizedCars/UnauthorizedCars';
 
-interface HomeProps {
+interface Props {
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Home: React.FC<HomeProps> = ({ setIsLoggedIn }) => {
+const CheckUnauthorized: React.FC<Props> = ({ setIsLoggedIn }) => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     setIsLoggedIn(false);
@@ -18,12 +14,10 @@ const Home: React.FC<HomeProps> = ({ setIsLoggedIn }) => {
 
   return (
     <ProtectedLayout onLogout={handleLogout}>
-      <Camera />
-      <LastCars />
-      <NewPlate />
+      <h1 className="text-2xl font-bold mb-4">Veículos Não Autorizados</h1>
       <UnauthorizedCarsTable />
     </ProtectedLayout>
   );
 };
 
-export default Home;
+export default CheckUnauthorized;
