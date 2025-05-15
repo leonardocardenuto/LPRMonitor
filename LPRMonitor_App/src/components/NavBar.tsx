@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import { FaAd, FaCannabis, FaCar, FaHome, FaInfoCircle } from 'react-icons/fa';
 import logo from '../assets/logo_white.png';
 import { motion }from "framer-motion";
+import { useNavigate } from 'react-router-dom';
 
 interface NavBarProps {
   onLogout: () => void;
@@ -9,6 +10,7 @@ interface NavBarProps {
 
 const NavBar: React.FC <NavBarProps> = ({ onLogout }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="flex h-screen">
@@ -46,7 +48,7 @@ const NavBar: React.FC <NavBarProps> = ({ onLogout }) => {
         {/* Ícones e Nomes */}
           <div className='flex flex-col justify-between h-auto'>
             <div className="space-y-6 ml-2 ">
-              <button>
+              <button onClick={() => {}}>
                 <div className="flex items-center space-x-4">
                   <FaHome className="w-8 h-8" />
                   <span
@@ -70,7 +72,7 @@ const NavBar: React.FC <NavBarProps> = ({ onLogout }) => {
                   </span>
                 </div>
               </button>
-              <button>
+              <button onClick={() => navigate('/check-unauthorized')}>
                 <div className="flex items-center space-x-4">
                   <FaCar className="w-8 h-8" />
                   <span

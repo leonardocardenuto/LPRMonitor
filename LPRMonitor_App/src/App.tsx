@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import Login from './components/Login';
+import CheckUnauthorized from './components/CheckUnauthorized';
 import Home from './components/Home';
+
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -14,26 +16,29 @@ const App: React.FC = () => {
     setIsLoading(false);
   }, []);
 
-  if (isLoading) {
-    return <div>Carregando...</div>;
-  }
+  if (isLoading) return <div>Carregando...</div>;
 
   return (
     <BrowserRouter>
       <Routes>
-        {/* Sempre acessível */}
         <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
 
-        {/* Protegido: só acessa se estiver logado */}
         <Route
           path="/"
+          element={isLoggedIn ? <Home setIsLoggedIn={setIsLoggedIn} /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/check-unauthorized"
           element={
-            isLoggedIn ? <Home setIsLoggedIn={setIsLoggedIn} /> : <Navigate to="/login" replace />
+            isLoggedIn ? (
+              <CheckUnauthorized setIsLoggedIn={setIsLoggedIn} />
+            ) : (
+              <Navigate to="/login" />
+            )
           }
         />
 
-        {/* Qualquer outro caminho → redireciona para login */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
   );
