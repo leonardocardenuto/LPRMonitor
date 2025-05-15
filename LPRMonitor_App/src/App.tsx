@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import NavBar from './components/NavBar';
 import Camera from './components/containers/Camera';
-import NewPlateProps from './components/containers/NewPlate';
+import NewPlateProps from './components/containers/NewPlate/NewPlate';
 import LastCars from './components/containers/LastCars/LastCars';
 import UnauthorizedCarsTable from './components/containers/UnauthorizedCars/UnauthorizedCars';
 

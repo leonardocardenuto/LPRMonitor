@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaAd, FaCannabis, FaHome, FaInfoCircle } from 'react-icons/fa';
+import { FaAd, FaCannabis, FaCar, FaHome, FaInfoCircle } from 'react-icons/fa';
 import logo from '../assets/logo_white.png';
 import { motion }from "framer-motion";
 
@@ -72,7 +72,7 @@ const NavBar: React.FC <NavBarProps> = ({ onLogout }) => {
               </button>
               <button>
                 <div className="flex items-center space-x-4">
-                  <FaCannabis className="w-8 h-8" />
+                  <FaCar className="w-8 h-8" />
                   <span
                     className={`transition-opacity duration-300 font-bold ${
                       menuOpen ? 'opacity-100' : 'opacity-0'
