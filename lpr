@@ -6,6 +6,8 @@
 
 BACK_DIR="flask_back"
 BACK_DIR_ABS="$(realpath "$BACK_DIR")"
+YOLO_DIR="yolo_model"
+YOLO_DIR_ABS="$(realpath "$YOLO_DIR")"
 VENV_DIR="$BACK_DIR_ABS/.venv"
 REQUIREMENTS_FILE="$BACK_DIR_ABS/requirements.txt"
 OS="$(uname -s)"
@@ -118,6 +120,12 @@ run_app() {
   (cd "$BACK_DIR_ABS" && export PYTHONPATH="$BACK_DIR_ABS:$PYTHONPATH" && python "$script_name")
 }
 
+run_yolo() {
+  activate_venv
+  log_info "Rodando YOLO..."
+  (cd "$YOLO_DIR_ABS" && export PYTHONPATH="$YOLO_DIR_ABS:$PYTHONPATH" && python test.py)
+}
+
 migrate_db() {
   check_production
   activate_venv
@@ -167,6 +175,7 @@ set_flask_env
 # Roteia os comandos
 case "$1" in
   run) run_app ;;
+  yolo) run_yolo ;;
   migrate) migrate_db ;;
   routes) show_routes ;;
   pip) install_deps ;;
