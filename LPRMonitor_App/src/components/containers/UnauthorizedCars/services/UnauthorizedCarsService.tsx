@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/check_plate/get_last_plates'; // Replace with your actual endpoint
+const API_URL = 'http://localhost:5000/check_plate/get_last_plates';
 
 export const fetchLastUnauthorizedCars = async () => {
     try {
