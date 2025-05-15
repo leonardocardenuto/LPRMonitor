@@ -42,7 +42,7 @@ def validar_formato(texto, classe):
     return False
 
 
-placa_model = YOLO('best.pt')                
+placa_model = YOLO('plate_detection.pt')                
 caracteres_model = YOLO('character_detection.pt')     
 
 video_path = selecionar_video()
