@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import Login from './components/Login';
 import CheckUnauthorized from './components/CheckUnauthorized';
 import Home from './components/Home';
-
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -19,14 +18,23 @@ const App: React.FC = () => {
   if (isLoading) return <div>Carregando...</div>;
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
-
         <Route
           path="/"
           element={isLoggedIn ? <Home setIsLoggedIn={setIsLoggedIn} /> : <Navigate to="/login" />}
         />
+         <Route
+          path="/home"
+          element={
+            isLoggedIn ? (
+              <Home setIsLoggedIn={setIsLoggedIn} />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />       
         <Route
           path="/check-unauthorized"
           element={
@@ -37,10 +45,9 @@ const App: React.FC = () => {
             )
           }
         />
-
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 };
 
