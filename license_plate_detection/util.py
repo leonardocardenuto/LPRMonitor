@@ -3,8 +3,10 @@ from ultralytics import YOLO
 import re
 from tkinter import Tk, filedialog
 
-# ⚠️ Esse arquivo nao mostra as deteccoes em tempo real, para ve-las va para ..\yolo_model\test_video.py
+import cv2
+import numpy as np
 
+# ⚠️ Esse arquivo nao mostra as deteccoes em tempo real, para ve-las va para ..\yolo_model\test_video.py
 def selecionar_video():
     root = Tk()
     root.withdraw()
@@ -12,6 +14,29 @@ def selecionar_video():
         title="Selecione um vídeo",
         filetypes=[("Arquivos de vídeo", "*.mp4 *.avi *.mov")]
     )
+
+
+def get_camera_image():
+    # Testar automaticamente as 5 primeiras câmeras
+    cap = cv2.VideoCapture(1)  # Mude o número se não funcionar (0, 2, 3...)
+
+    if not cap.isOpened():
+        print("Não foi possível abrir a câmera.")
+        exit()
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            print("Falha ao capturar frame. Saindo...")
+            break
+
+        cv2.imshow('DroidCam Viewer', frame)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
 
 def corrigir_formato(texto, classe):
     letra_para_num = {'A': '4', 'B': '8', 'E': '3', 'G': '6', 'I': '1', 'O': '0', 'S': '5', 'T': '7', 'Z': '2'}
@@ -61,8 +86,7 @@ def get_placas():
         ret, frame = cap.read()
         if not ret:
             break
-
-        #Processando apenas frames multiplos de 4 para melhorar eficiencia
+        
         frame_id = int(cap.get(cv2.CAP_PROP_POS_FRAMES)) - 1 
 
         if frame_id % 4 != 0:
@@ -106,3 +130,5 @@ def get_placas():
                     placas_diferentes.add(placa_texto)
 
     return placas_diferentes
+
+get_camera_image()
