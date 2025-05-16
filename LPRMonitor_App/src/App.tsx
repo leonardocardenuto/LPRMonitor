@@ -4,59 +4,82 @@ import Camera from './components/containers/Camera';
 import NewPlateProps from './components/containers/NewPlate/NewPlate';
 import LastCars from './components/containers/LastCars/LastCars';
 import UnauthorizedCarsTable from './components/containers/UnauthorizedCars/UnauthorizedCars';
-import Login from './components/containers/Auth/Login'; 
+import Login from './components/containers/Auth/Login';
 import { postLogin } from './components/containers/Auth/services/AuthService';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+
+const Home: React.FC<{ onLogout: () => void }> = ({ onLogout }) => (
+  <div className="flex h-screen bg-[#DEE5E5]">
+    <NavBar onLogout={onLogout} />
+    <div className="flex-1 m-8 relative">
+      <Camera />
+      <LastCars />
+      <NewPlateProps />
+      <UnauthorizedCarsTable />
+    </div>
+  </div>
+);
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState('');
-  const [senha, setSenha] = useState('');
-  const [erro, setErro] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
+    setIsLoading(false);
   }, []);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async (
+    username: string,
+    senha: string,
+    setError: (msg: string) => void
+  ) => {
     try {
-      const data = await postLogin(username,senha);
+      const data = await postLogin(username, senha);
       localStorage.setItem('token', data.token);
       setIsLoggedIn(true);
-      setErro('');
+      setError('');
     } catch (error) {
-      setErro('Username ou senha inválidos');
+      setError('Username ou senha inválidos');
     }
   };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     setIsLoggedIn(false);
-    setUsername('');
-    setSenha('');
-    setErro('');
   };
 
-  return isLoggedIn ? (
-    <div className="flex h-screen bg-[#DEE5E5]">
-      <NavBar onLogout={handleLogout} />
-      <div className="flex-1 m-8 relative">
-        <Camera />
-        <LastCars />
-        <NewPlateProps />
-        <UnauthorizedCarsTable />
-      </div>
-    </div>
-  ) : (
-    <Login
-      username={username}
-      senha={senha}
-      erro={erro}
-      setUsername={setUsername}
-      setSenha={setSenha}
-      onSubmit={handleLogin}
-    />
+  if (isLoading) {
+    return <div>Carregando...</div>;
+  }
+
+  return (
+    <HashRouter>
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            isLoggedIn ? (
+              <Navigate to="/" replace />
+            ) : (
+              <Login onLogin={handleLogin} />
+            )
+          }
+        />
+        <Route
+          path="/"
+          element={
+            isLoggedIn ? (
+              <Home onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </HashRouter>
   );
 };
 
