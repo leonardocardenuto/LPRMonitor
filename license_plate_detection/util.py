@@ -68,40 +68,35 @@ def validar_formato(texto, classe):
         return re.fullmatch(r'[A-Z]{3}[0-9][A-Z][0-9]{2}', texto)
     return False
 
-#Funcao que retorna apenas as placas diferentes detectadas
 def get_placas():
     placa_model = YOLO('../yolo_model/plate_detection.pt')                
     caracteres_model = YOLO('../yolo_model/character_detection.pt')     
 
-    video_path = selecionar_video()
-    if not video_path:
-        print("Nenhum vídeo selecionado. Saindo...")
-        exit()
-
-    cap = cv2.VideoCapture(video_path)
-
     placas_diferentes = set()
 
-    while cap.isOpened():
+    cap = cv2.VideoCapture(1)
+
+    if not cap.isOpened():
+        print("Não foi possível abrir a câmera.")
+        exit()
+
+    while True:
         ret, frame = cap.read()
         if not ret:
+            print("Falha ao capturar frame. Saindo...")
             break
-        
-        frame_id = int(cap.get(cv2.CAP_PROP_POS_FRAMES)) - 1 
-
-        if frame_id % 4 != 0:
-            continue
 
         placas_result = placa_model(frame, verbose=False)
 
         for r in placas_result:
             boxes = r.boxes.xyxy.cpu().numpy()
-            confs = r.boxes.conf.cpu().numpy()
             classes = r.boxes.cls.cpu().numpy()
 
-            for box, conf, cls_idx in zip(boxes, confs, classes):
+            for box, cls_idx in zip(boxes, classes):
                 x1, y1, x2, y2 = map(int, box)
                 class_name = placa_model.model.names[int(cls_idx)]
+
+                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
                 placa_crop = frame[y1:y2, x1:x2]
                 if placa_crop.size == 0:
@@ -127,8 +122,19 @@ def get_placas():
                 todas_confiancas_validas = all(c['score'] >= 0.7 for c in caracteres_ordenados)
 
                 if validar_formato(placa_texto, class_name) and todas_confiancas_validas:
-                    placas_diferentes.add(placa_texto)
+                    if placa_texto not in placas_diferentes:
+                        print(f"Placa detectada: {placa_texto}")
+                        placas_diferentes.add(placa_texto)
 
+                    cv2.putText(frame, placa_texto, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+
+        cv2.imshow('Leitor de Placas - AO VIVO', frame)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
     return placas_diferentes
 
-get_camera_image()
+get_placas()
