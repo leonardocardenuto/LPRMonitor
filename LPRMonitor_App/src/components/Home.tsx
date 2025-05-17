@@ -21,7 +21,7 @@ const Home: React.FC<HomeProps> = ({ setIsLoggedIn }) => {
       <Camera />
       <LastCars />
       <NewPlate />
-      <UnauthorizedCarsTable />
+      <UnauthorizedCarsTable className='bottom-0 right-0 absolute w-5/12 h-2/5' />
     </ProtectedLayout>
   );
 };

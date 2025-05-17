@@ -36,6 +36,7 @@ const NewPlate: React.FC = () => {
         },
     };
 
+
     return (
         <motion.div className="absolute bottom-0 left-0 w-1/2 h-2/5 bg-white flex flex-col justify-evenly" 
         variants={shakeVariant}
