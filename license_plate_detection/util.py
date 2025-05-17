@@ -2,6 +2,8 @@ import cv2
 from ultralytics import YOLO
 import re
 from tkinter import Tk, filedialog
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
 
 import cv2
 import numpy as np
@@ -45,17 +47,8 @@ def validar_formato(texto, classe):
         return re.fullmatch(r'[A-Z]{3}[0-9][A-Z][0-9]{2}', texto)
     return False
 
-#Enviar placa para o back-end
-def send_request(placa):
-    print(f'Veiculo com placa {placa} entrando')
-
-def get_placas():
-    placa_model = YOLO('../yolo_model/plate_detection.pt')                
-    caracteres_model = YOLO('../yolo_model/character_detection.pt')     
-
-    placas_diferentes = set()
-
-    ip_droidcam = '' # Colocar o ip do wifi que aparece no app do droidcam
+def procurar_veiculo(placa_procurada, ip_droidcam, placa_model, caracteres_model): 
+    frame_count = 0   
     cap = cv2.VideoCapture(f'http://{ip_droidcam}:4747/video') 
 
     while True:
@@ -63,7 +56,100 @@ def get_placas():
         if not ret:
             print("Falha ao capturar frame. Saindo...")
             break
+        
+        frame_count += 1
+        if frame_count % 4 != 0:
+            continue
+        
+        placas_result = placa_model(frame, verbose=False)
 
+        for r in placas_result:
+            boxes = r.boxes.xyxy.cpu().numpy()
+            classes = r.boxes.cls.cpu().numpy()
+
+            for box, cls_idx in zip(boxes, classes):
+                x1, y1, x2, y2 = map(int, box)
+                class_name = placa_model.model.names[int(cls_idx)]
+
+                placa_crop = frame[y1:y2, x1:x2]
+                if placa_crop.size == 0:
+                    continue
+
+                caracteres_result = caracteres_model(placa_crop, verbose=False)[0]
+
+                caracteres_detectados = []
+                for char_box in caracteres_result.boxes.data.tolist():
+                    cx1, cy1, cx2, cy2, score, char_id = char_box
+                    char_label = caracteres_model.model.names[int(char_id)]
+                    caracteres_detectados.append({
+                        'label': char_label,
+                        'bbox': [cx1, cy1, cx2, cy2],
+                        'x1': cx1,
+                        'score': score
+                    })
+
+                caracteres_ordenados = sorted(caracteres_detectados, key=lambda c: c['x1'])
+
+                placa_texto = corrigir_formato(''.join([c['label'] for c in caracteres_ordenados]), class_name)
+
+                todas_confiancas_validas = all(c['score'] >= 0.7 for c in caracteres_ordenados)
+                
+                if validar_formato(placa_texto, class_name) and todas_confiancas_validas:
+                    if placa_texto == placa_procurada:
+                        print(f'Carro com placa {placa_procurada} encontrado na câmera de IP {ip_droidcam}')
+                        cap.release()
+                        cv2.destroyAllWindows()
+                        return ip_droidcam
+
+        if frame_count >= 200:
+            print(f'Veículo com placa {placa_procurada} **não** encontrado na câmera de IP {ip_droidcam}')
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+    return None
+
+
+def perseguir_veiculo(placa, cameras_de_seguranca):
+    placa_model = YOLO('../yolo_model/plate_detection.pt')                
+    caracteres_model = YOLO('../yolo_model/character_detection.pt')
+
+    with ThreadPoolExecutor() as executor:
+        futures = [
+            executor.submit(procurar_veiculo, placa, ip, placa_model, caracteres_model)
+            for ip in cameras_de_seguranca
+        ]
+
+        for future in as_completed(futures):
+            resultado = future.result()
+            if resultado is not None:
+                print(f"Veículo encontrado! IP: {resultado}")
+                return True  
+
+    return False 
+
+def get_placas(ip_droidcam):
+    placa_model = YOLO('../yolo_model/plate_detection.pt')                
+    caracteres_model = YOLO('../yolo_model/character_detection.pt')   
+    
+    frame_count = 0   
+    placas_diferentes = set()
+
+    cap = cv2.VideoCapture(f'http://{ip_droidcam}:4747/video') 
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            print("Falha ao capturar frame. Saindo...")
+            break
+        
+        frame_count += 1
+        if frame_count % 4 != 0:
+            cv2.imshow('Leitor de Placas', frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+            continue
+        
         placas_result = placa_model(frame, verbose=False)
 
         for r in placas_result:
@@ -94,18 +180,19 @@ def get_placas():
                     })
 
                 caracteres_ordenados = sorted(caracteres_detectados, key=lambda c: c['x1'])
-
                 placa_texto = corrigir_formato(''.join([c['label'] for c in caracteres_ordenados]), class_name)
-
                 todas_confiancas_validas = all(c['score'] >= 0.7 for c in caracteres_ordenados)
-                
                 
                 if validar_formato(placa_texto, class_name) and todas_confiancas_validas:
                     if placa_texto not in placas_diferentes:
                         print(f"Placa detectada: {placa_texto}")
-                        send_request(placa_texto)
                         placas_diferentes.add(placa_texto)
-                        
+                        resposta = input("Você deseja rastrear esse veículo? (y/n) ").lower()
+                        if resposta == 'y':
+                            cap.release()
+                            cv2.destroyAllWindows()
+                            time.sleep(1)
+                            perseguir_veiculo(placa_texto, ['192.168..', '192.168..'])
 
                     cv2.putText(frame, placa_texto, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
 
@@ -118,4 +205,5 @@ def get_placas():
     cv2.destroyAllWindows()
     return placas_diferentes
 
-get_placas()
+
+get_placas('192.168.')
