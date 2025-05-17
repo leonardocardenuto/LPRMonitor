@@ -18,7 +18,7 @@ interface UnauthorizedCar {
 
 const columns: ColumnDef<UnauthorizedCar>[] = [
     {
-        header: 'Placa', 
+        header: 'Placa',
         accessorKey: 'plate',
     },
     {
@@ -31,7 +31,11 @@ const columns: ColumnDef<UnauthorizedCar>[] = [
     },
 ];
 
-const UnauthorizedCarsTable: React.FC = () => {
+type UnauthorizedCarsTableProps = {
+    className?: string;
+};
+
+const UnauthorizedCarsTable: React.FC<UnauthorizedCarsTableProps> = ({ className = '' }) => {
     const [data, setData] = useState<UnauthorizedCar[]>([]);
     const [sorting, setSorting] = useState<SortingState>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -42,21 +46,21 @@ const UnauthorizedCarsTable: React.FC = () => {
                 const result = await fetchLastUnauthorizedCars();
                 const transformed = result.plates.map((item: any) => ({
                     plate: item.license_plate,
-                    time: new Date(item.created_at).toLocaleString("pt-BR", { timeZone: "UTC", hour12: false }), 
-                    description: item.description, 
+                    time: new Date(item.created_at).toLocaleString("pt-BR", { timeZone: "UTC", hour12: false }),
+                    description: item.description,
                 }));
                 setData(transformed);
             } catch (error) {
                 console.error('Error fetching unauthorized cars:', error);
-                setData([]); 
+                setData([]);
             } finally {
-                setLoading(false); 
+                setLoading(false);
             }
         };
 
         fetchData();
     }, []);
-    
+
     const table = useReactTable({
         data: data.length > 0 ? data : [],
         columns,
@@ -67,7 +71,7 @@ const UnauthorizedCarsTable: React.FC = () => {
     });
 
     return (
-        <div className="absolute bottom-0 right-0 w-5/12 h-2/5 bg-white shadow-xl rounded-2xl overflow-hidden">
+        <div className={`bg-white shadow-xl rounded-2xl overflow-hidden ${className}`}>
             <div className="p-4 border-b bg-gray-100 text-center">
                 <h2 className="text-lg font-semibold text-gray-800">Últimos Carros Não Autorizados</h2>
             </div>

@@ -48,7 +48,7 @@ const NavBar: React.FC <NavBarProps> = ({ onLogout }) => {
         {/* Ícones e Nomes */}
           <div className='flex flex-col justify-between h-auto'>
             <div className="space-y-6 ml-2 ">
-              <button onClick={() => {}}>
+              <button onClick={() => navigate('/home')}>
                 <div className="flex items-center space-x-4">
                   <FaHome className="w-8 h-8" />
                   <span

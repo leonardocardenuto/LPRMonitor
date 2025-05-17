@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import Login from './components/Login';
-import CheckUnauthorized from './components/CheckUnauthorized';
+import CheckUnauthorized from './components/CheckCars/CheckUnauthorized';
 import Home from './components/Home';
-
+import IdentifyCar from './components/CheckCars/IdentifyCar';
+import { LocalizationProvider } from '@mui/x-date-pickers';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -19,14 +20,23 @@ const App: React.FC = () => {
   if (isLoading) return <div>Carregando...</div>;
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
-
         <Route
           path="/"
           element={isLoggedIn ? <Home setIsLoggedIn={setIsLoggedIn} /> : <Navigate to="/login" />}
         />
+         <Route
+          path="/home"
+          element={
+            isLoggedIn ? (
+              <Home setIsLoggedIn={setIsLoggedIn} />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />       
         <Route
           path="/check-unauthorized"
           element={
@@ -37,10 +47,23 @@ const App: React.FC = () => {
             )
           }
         />
-
+        <Route
+          path="/check"
+          element={
+            isLoggedIn ? (
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    {/* Seu componente com DatePicker, etc */}
+                    <IdentifyCar setIsLoggedIn={setIsLoggedIn} />
+                  </LocalizationProvider>
+              
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 };
 
