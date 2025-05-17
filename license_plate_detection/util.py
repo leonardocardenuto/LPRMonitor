@@ -6,7 +6,7 @@ from tkinter import Tk, filedialog
 import cv2
 import numpy as np
 
-# ⚠️ Esse arquivo nao mostra as deteccoes em tempo real, para ve-las va para ..\yolo_model\test_video.py
+
 def selecionar_video():
     root = Tk()
     root.withdraw()
@@ -14,29 +14,6 @@ def selecionar_video():
         title="Selecione um vídeo",
         filetypes=[("Arquivos de vídeo", "*.mp4 *.avi *.mov")]
     )
-
-
-def get_camera_image():
-    # Testar automaticamente as 5 primeiras câmeras
-    cap = cv2.VideoCapture(1)  # Mude o número se não funcionar (0, 2, 3...)
-
-    if not cap.isOpened():
-        print("Não foi possível abrir a câmera.")
-        exit()
-
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            print("Falha ao capturar frame. Saindo...")
-            break
-
-        cv2.imshow('DroidCam Viewer', frame)
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()
 
 def corrigir_formato(texto, classe):
     letra_para_num = {'A': '4', 'B': '8', 'E': '3', 'G': '6', 'I': '1', 'O': '0', 'S': '5', 'T': '7', 'Z': '2'}
@@ -68,17 +45,18 @@ def validar_formato(texto, classe):
         return re.fullmatch(r'[A-Z]{3}[0-9][A-Z][0-9]{2}', texto)
     return False
 
+#Enviar placa para o back-end
+def send_request(placa):
+    print(f'Veiculo com placa {placa} entrando')
+
 def get_placas():
     placa_model = YOLO('../yolo_model/plate_detection.pt')                
     caracteres_model = YOLO('../yolo_model/character_detection.pt')     
 
     placas_diferentes = set()
 
-    cap = cv2.VideoCapture(1)
-
-    if not cap.isOpened():
-        print("Não foi possível abrir a câmera.")
-        exit()
+    ip_droidcam = '' # Colocar o ip do wifi que aparece no app do droidcam
+    cap = cv2.VideoCapture(f'http://{ip_droidcam}:4747/video') 
 
     while True:
         ret, frame = cap.read()
@@ -120,15 +98,18 @@ def get_placas():
                 placa_texto = corrigir_formato(''.join([c['label'] for c in caracteres_ordenados]), class_name)
 
                 todas_confiancas_validas = all(c['score'] >= 0.7 for c in caracteres_ordenados)
-
+                
+                
                 if validar_formato(placa_texto, class_name) and todas_confiancas_validas:
                     if placa_texto not in placas_diferentes:
                         print(f"Placa detectada: {placa_texto}")
+                        send_request(placa_texto)
                         placas_diferentes.add(placa_texto)
+                        
 
                     cv2.putText(frame, placa_texto, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
 
-        cv2.imshow('Leitor de Placas - AO VIVO', frame)
+        cv2.imshow('Leitor de Placas', frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
