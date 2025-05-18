@@ -6,7 +6,6 @@ import {
   flexRender,
   ColumnDef,
   SortingState,
-  createColumnHelper,
 } from '@tanstack/react-table';
 import { fetchLastCars } from './services/LastCarsService';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -15,6 +14,10 @@ interface LastCar {
     plate: string;
     description: string;
     time: string;
+}
+
+interface LastCarsTableProps {
+  updateTrigger?: number;  // optional prop for triggering reloads
 }
 
 const columns: ColumnDef<LastCar>[] = [
@@ -32,14 +35,14 @@ const columns: ColumnDef<LastCar>[] = [
     },
 ];
     
-
-const LastCarsTable: React.FC = () => {
+const LastCarsTable: React.FC<LastCarsTableProps> = ({ updateTrigger }) => {
     const [data, setData] = useState<LastCar[]>([]);
     const [sorting, setSorting] = useState<SortingState>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             try {
                 const result = await fetchLastCars();
                 const transformed = result.plates.map((item: any) => ({
@@ -57,7 +60,7 @@ const LastCarsTable: React.FC = () => {
         };
 
         fetchData();
-    }, []);
+    }, [updateTrigger]);  // <-- reload data when updateTrigger changes
     
     const table = useReactTable({
         data: data.length > 0 ? data : [],

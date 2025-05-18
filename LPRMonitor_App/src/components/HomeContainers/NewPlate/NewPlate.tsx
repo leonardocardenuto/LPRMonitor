@@ -2,29 +2,30 @@ import React, { useEffect, useState } from 'react';
 import { fetchCheckPlateExists } from './fetchCheckPlate';
 import { motion } from 'framer-motion';
 
+interface NewPlateProps {
+  updateTrigger?: number;  // optional trigger to re-check plate
+}
 
-
-
-const NewPlate: React.FC = () => {
+const NewPlate: React.FC<NewPlateProps> = ({ updateTrigger }) => {
     const [plateExists, setPlateExists] = useState<boolean | null>(null);
-    const newPlate = "SVU-2G24"; // placa exemplo
+    const newPlate = "SVU-2G24"; // example plate
     const [triggerAnimation, setTriggerAnimation] = useState(false);
 
+    // Re-check plate on mount and whenever updateTrigger changes
     useEffect(() => {
         console.log("Verificando a placa:", newPlate);
         const checkPlate = async () => {
             const exists = await fetchCheckPlateExists(newPlate);
             setPlateExists(exists);
-
         };
 
         checkPlate();
-    }, []);
+    }, [updateTrigger]);  // <-- dependency added here
 
     useEffect(() => {
         if (plateExists === false) {
             setTriggerAnimation(true);
-            const timer = setTimeout(() => setTriggerAnimation(false), 1000); // animação por 1 segundo
+            const timer = setTimeout(() => setTriggerAnimation(false), 1000); // animation 1s
             return () => clearTimeout(timer);
         }
     }, [plateExists]);
@@ -36,11 +37,12 @@ const NewPlate: React.FC = () => {
         },
     };
 
-
     return (
-        <motion.div className="absolute bottom-0 left-0 w-1/2 h-2/5 bg-white flex flex-col justify-evenly" 
-        variants={shakeVariant}
-        animate={triggerAnimation ? 'shake' : ''}>
+        <motion.div
+          className="absolute bottom-0 left-0 w-1/2 h-2/5 bg-white flex flex-col justify-evenly"
+          variants={shakeVariant}
+          animate={triggerAnimation ? 'shake' : ''}
+        >
             <div className='bg-blue-600 w-full h-1/6 border-t-2 border-l-2 border-r-2 border-black items-center flex justify-center text-[white] font-bold'>
                 <h3>Instituto Mauá de Tecnologia</h3>
             </div>
@@ -53,7 +55,6 @@ const NewPlate: React.FC = () => {
                 className={`w-full h-1/3 flex justify-center items-center text-[black] text-[48px] font-bold ${
                     plateExists ? 'bg-green-400' : 'bg-red-400'
                 }`}
-                
             >
                 {plateExists ? `Cadastrada` : `Não Cadastrada`}
             </div>

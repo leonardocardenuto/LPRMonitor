@@ -46,11 +46,15 @@ const createWindow = async () => {
       responseHeaders: {
         ...details.responseHeaders,
         'Content-Security-Policy': [
-          "default-src 'self' data: 'unsafe-inline' 'unsafe-eval'; connect-src 'self' http://localhost:5000 ws://localhost:3000"
+          "default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval'; " +
+          "img-src 'self' data: https: http: blob:; " +
+          "media-src 'self' data: https: http: blob:; " +
+          "connect-src 'self' http://localhost:5000 ws://localhost:3000 http://192.168.0.173:8080;"
         ],
       },
     });
   });
+  
 
   if (isDev) {
     try {

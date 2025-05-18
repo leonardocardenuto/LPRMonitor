@@ -54,7 +54,7 @@ def registrar_placa_via_api(placa):
     api_url = "http://127.0.0.1:5000/yolo/register_car"
     headers = {"Content-Type": "application/json"}
     data = {"license_plate": placa}
-
+    print(f"Enviando placa {placa} para API...")
     try:
         response = requests.post(api_url, json=data, headers=headers)
         response.raise_for_status()
@@ -75,7 +75,7 @@ def get_placas():
     placas_diferentes = set()
 
     ip_droidcam = '192.168.0.173' # Colocar o ip do wifi que aparece no app do droidcam
-    cap = cv2.VideoCapture(f'http://{ip_droidcam}:4747/video') 
+    cap = cv2.VideoCapture(f'https://{ip_droidcam}:8080/video') 
 
     while True:
         ret, frame = cap.read()

@@ -33,15 +33,17 @@ const columns: ColumnDef<UnauthorizedCar>[] = [
 
 type UnauthorizedCarsTableProps = {
     className?: string;
+    updateTrigger?: number;  // added updateTrigger prop
 };
 
-const UnauthorizedCarsTable: React.FC<UnauthorizedCarsTableProps> = ({ className = '' }) => {
+const UnauthorizedCarsTable: React.FC<UnauthorizedCarsTableProps> = ({ className = '', updateTrigger }) => {
     const [data, setData] = useState<UnauthorizedCar[]>([]);
     const [sorting, setSorting] = useState<SortingState>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             try {
                 const result = await fetchLastUnauthorizedCars();
                 const transformed = result.plates.map((item: any) => ({
@@ -59,7 +61,7 @@ const UnauthorizedCarsTable: React.FC<UnauthorizedCarsTableProps> = ({ className
         };
 
         fetchData();
-    }, []);
+    }, [updateTrigger]);  // reload on updateTrigger change
 
     const table = useReactTable({
         data: data.length > 0 ? data : [],
