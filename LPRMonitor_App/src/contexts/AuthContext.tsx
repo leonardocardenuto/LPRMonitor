@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { postLogin } from '../assets/services/Auth/AuthService';
+import { postLogin } from '../services/Auth/AuthService';
 
 interface AuthContextType {
   isLoggedIn: boolean;

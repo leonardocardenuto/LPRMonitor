@@ -6,7 +6,7 @@
 
 BACK_DIR="flask_back"
 BACK_DIR_ABS="$(realpath "$BACK_DIR")"
-YOLO_DIR="yolo_model"
+YOLO_DIR="license_plate_detection"
 YOLO_DIR_ABS="$(realpath "$YOLO_DIR")"
 VENV_DIR="$BACK_DIR_ABS/.venv"
 REQUIREMENTS_FILE="$BACK_DIR_ABS/requirements.txt"
@@ -123,7 +123,7 @@ run_app() {
 run_yolo() {
   activate_venv
   log_info "Rodando YOLO..."
-  (cd "$YOLO_DIR_ABS" && export PYTHONPATH="$YOLO_DIR_ABS:$PYTHONPATH" && python test.py)
+  (cd "$YOLO_DIR_ABS" && export PYTHONPATH="$YOLO_DIR_ABS:$PYTHONPATH" && python util.py)
 }
 
 migrate_db() {

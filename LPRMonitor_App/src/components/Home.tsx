@@ -1,5 +1,5 @@
 import React from 'react';
-import ProtectedLayout from '../components/ProtectedLayout';
+import ProtectedLayout from './ProtectedLayout';
 import { useAuth } from '../contexts/AuthContext';
 
 import Camera from './HomeContainers/Camera';

@@ -1,5 +1,5 @@
 import React from 'react';
-import ProtectedLayout from '../components/ProtectedLayout';
+import ProtectedLayout from './ProtectedLayout';
 import UnauthorizedCarsTable from './HomeContainers/UnauthorizedCars/UnauthorizedCars';
 
 const CheckUnauthorized: React.FC = () => {

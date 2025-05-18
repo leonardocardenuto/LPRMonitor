@@ -5,6 +5,7 @@ from tkinter import Tk, filedialog
 
 import cv2
 import numpy as np
+import requests
 
 
 def selecionar_video():
@@ -45,6 +46,24 @@ def validar_formato(texto, classe):
         return re.fullmatch(r'[A-Z]{3}[0-9][A-Z][0-9]{2}', texto)
     return False
 
+
+def registrar_placa_via_api(placa):
+    """
+    Envia uma solicitação para registrar a placa no backend via API.
+    """
+    api_url = "http://127.0.0.1:5000/yolo/register_car"
+    headers = {"Content-Type": "application/json"}
+    data = {"license_plate": placa}
+
+    try:
+        response = requests.post(api_url, json=data, headers=headers)
+        response.raise_for_status()
+        print(f"API Response: {response.json()}")
+        return True
+    except requests.exceptions.RequestException as e:
+        print(f"Falha ao enviar placa para API: {e}")
+        return False
+
 #Enviar placa para o back-end
 def send_request(placa):
     print(f'Veiculo com placa {placa} entrando')
@@ -55,7 +74,7 @@ def get_placas():
 
     placas_diferentes = set()
 
-    ip_droidcam = '' # Colocar o ip do wifi que aparece no app do droidcam
+    ip_droidcam = '192.168.0.173' # Colocar o ip do wifi que aparece no app do droidcam
     cap = cv2.VideoCapture(f'http://{ip_droidcam}:4747/video') 
 
     while True:
@@ -102,11 +121,9 @@ def get_placas():
                 
                 if validar_formato(placa_texto, class_name) and todas_confiancas_validas:
                     if placa_texto not in placas_diferentes:
-                        print(f"Placa detectada: {placa_texto}")
-                        send_request(placa_texto)
-                        placas_diferentes.add(placa_texto)
-                        
-
+                        if registrar_placa_via_api(placa_texto):
+                            send_request(placa_texto)
+                            placas_diferentes.add(placa_texto)
                     cv2.putText(frame, placa_texto, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
 
         cv2.imshow('Leitor de Placas', frame)
