@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
-import { TextField } from '@mui/material';
 import ProtectedLayout from '../ProtectedLayout';
+import { useAuth } from '../../contexts/AuthContext';
 
 const statusOptions = [
   { value: 'student', label: 'Aluno' },
@@ -11,21 +11,14 @@ const statusOptions = [
   { value: 'banned', label: 'Perigo' },
 ];
 
-interface IdentifyCarProps {
-  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const IdentifyCar: React.FC<IdentifyCarProps> = ({ setIsLoggedIn }) => {
+const IdentifyCar: React.FC = () => {
   const [plateName, setPlateName] = useState('');
   const [status, setStatus] = useState('');
   const [expireDate, setExpireDate] = useState<Dayjs | null>(null);
   const [extraInfo, setExtraInfo] = useState('');
   const [justification, setJustification] = useState('');
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setIsLoggedIn(false);
-  };
+  const { logout } = useAuth();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,14 +32,13 @@ const IdentifyCar: React.FC<IdentifyCarProps> = ({ setIsLoggedIn }) => {
   };
 
   return (
-    <ProtectedLayout onLogout={handleLogout}>
+    <ProtectedLayout onLogout={logout}>
       <form
         onSubmit={handleSubmit}
         className="w-auto mx-auto mt-10 bg-white p-6 rounded-2xl shadow-md"
       >
         <h2 className="text-2xl font-semibold mb-4 text-center">Identify Car</h2>
 
-        {/* Plate Name */}
         <div className="mb-4">
           <label className="block text-gray-700 mb-1">Plate Name *</label>
           <input
@@ -58,7 +50,6 @@ const IdentifyCar: React.FC<IdentifyCarProps> = ({ setIsLoggedIn }) => {
           />
         </div>
 
-        {/* Status */}
         <div className="mb-4">
           <label className="block text-gray-700 mb-1">Status *</label>
           <select
@@ -76,7 +67,6 @@ const IdentifyCar: React.FC<IdentifyCarProps> = ({ setIsLoggedIn }) => {
           </select>
         </div>
 
-        {/* Conditional Field */}
         {(status === 'student' || status === 'familiars') && (
           <div className="mb-4">
             <label className="block text-gray-700 mb-1">Extra Info *</label>
@@ -90,13 +80,12 @@ const IdentifyCar: React.FC<IdentifyCarProps> = ({ setIsLoggedIn }) => {
           </div>
         )}
 
-        {/* Expire Date */}
         <div className="mb-4">
           <label className="block text-gray-700 mb-1">Expire Date *</label>
           <DatePicker
             value={expireDate}
             onChange={setExpireDate}
-            format='DD/MM/YYYY'
+            format="DD/MM/YYYY"
             disablePast
             slotProps={{
               textField: {
@@ -107,7 +96,6 @@ const IdentifyCar: React.FC<IdentifyCarProps> = ({ setIsLoggedIn }) => {
           />
         </div>
 
-        {/* Justification */}
         <div className="mb-4">
           <label className="block text-gray-700 mb-1">Justification *</label>
           <textarea
@@ -118,7 +106,6 @@ const IdentifyCar: React.FC<IdentifyCarProps> = ({ setIsLoggedIn }) => {
           />
         </div>
 
-        {/* Submit Button */}
         <button
           type="submit"
           className="w-full bg-[#272932] hover:bg-[#5c6176] text-white py-2 rounded-md transition duration-200"

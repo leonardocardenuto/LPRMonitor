@@ -13,7 +13,7 @@ const Camera: React.FC = () => {
                 );
 
                 if (!videoInput) {
-                    setError('DroidCam not found. Is it connected and enabled?');
+                    setError('Não foi possível conectar a câmera. Verifique se ela está ativa.');
                     return;
                 }
 
@@ -41,7 +41,7 @@ const Camera: React.FC = () => {
     }, []);
 
     return (
-        <div className="absolute top-0 left-0 w-1/2 h-1/2 bg-white flex justify-center items-center">
+        <div className="absolute top-0 left-0 w-1/2 h-1/2 bg-white flex justify-center items-center rounded-2xl">
             {error ? (
                 <p className="text-[16px] text-[#888]">{error}</p>
             ) : (
@@ -49,7 +49,7 @@ const Camera: React.FC = () => {
                     ref={videoRef}
                     autoPlay
                     playsInline
-                    className="max-w-full max-h-full"
+                    className="w-full h-full object-cover rounded-2xl"
                 />
             )}
         </div>
