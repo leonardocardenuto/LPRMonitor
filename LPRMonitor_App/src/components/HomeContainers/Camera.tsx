@@ -13,7 +13,7 @@ const Camera: React.FC = () => {
                 );
 
                 if (!videoInput) {
-                    setError('DroidCam not found. Is it connected and enabled?');
+                    setError('Não foi possível conectar a câmera. Verifique se ela está ativa.');
                     return;
                 }
 
