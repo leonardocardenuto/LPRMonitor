@@ -1,22 +1,28 @@
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { CircularProgress } from '@mui/material';
+
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import Login from './components/Login';
+import CheckUnauthorized from './components/CheckCars/CheckUnauthorized';
+import IdentifyCar from './components/CheckCars/IdentifyCar';
 import Home from './components/Home';
-import CheckUnauthorized from './components/CheckUnauthorized';
+
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { CircularProgress } from '@mui/material';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isLoggedIn, loading } = useAuth();
 
   if (loading) {
-    return <CircularProgress/>;
+    return <CircularProgress />;
   }
 
   return isLoggedIn ? <>{children}</> : <Navigate to="/login" />;
 };
-
 
 const AppRoutes = () => (
   <Routes>
@@ -37,6 +43,16 @@ const AppRoutes = () => (
         </PrivateRoute>
       }
     />
+    <Route
+      path="/check"
+      element={
+        <PrivateRoute>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <IdentifyCar />
+          </LocalizationProvider>
+        </PrivateRoute>
+      }
+    />
     <Route path="*" element={<Navigate to="/login" />} />
   </Routes>
 );
@@ -47,6 +63,19 @@ const App: React.FC = () => {
       <HashRouter>
         <AppRoutes />
       </HashRouter>
+
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </AuthProvider>
   );
 };

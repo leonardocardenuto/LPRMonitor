@@ -1,28 +1,32 @@
 import React, { useState } from 'react';
-import { Box, Button, Paper, TextField, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Paper, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
 import logo from '../assets/logo_white.png';
+import useToast from '../hooks/useToast'; 
 
 const MotionLogo = motion.img;
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [senha, setSenha] = useState('');
-  const [erro, setErro] = useState('');
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErro('');
+    setLoading(true);
 
     const success = await login(username, senha);
+    setLoading(false);
+
     if (success) {
       navigate('/', { replace: true });
     } else {
-      setErro('Usuário ou senha inválidos');
+      toast.error('Usuário ou senha inválidos');
     }
   };
 
@@ -70,7 +74,7 @@ const Login: React.FC = () => {
           />
           <Typography
             variant="body1"
-            sx={{  color: '#cbd5e1', fontStyle: 'italic' }}
+            sx={{ color: '#cbd5e1', fontStyle: 'italic' }}
           >
             Sistema Inteligente de Monitoramento de Placas Veiculares
           </Typography>
@@ -103,16 +107,12 @@ const Login: React.FC = () => {
               autoComplete="current-password"
               slotProps={{ htmlInput: { className: 'focus:outline-none focus:ring-0' } }}
             />
-            {erro && (
-              <Typography color="error" variant="body2" textAlign="center" mt={1}>
-                {erro}
-              </Typography>
-            )}
             <Button
               type="submit"
               variant="contained"
               fullWidth
               size="large"
+              disabled={loading}
               sx={{
                 mt: 3,
                 py: 1.5,
@@ -121,7 +121,7 @@ const Login: React.FC = () => {
                 '&:hover': { backgroundColor: '#1e3a8a' },
               }}
             >
-              Entrar
+              {loading ? <CircularProgress size={24} color="inherit" /> : 'Entrar'}
             </Button>
           </Box>
         </Box>

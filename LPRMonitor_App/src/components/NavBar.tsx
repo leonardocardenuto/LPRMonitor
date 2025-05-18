@@ -91,29 +91,30 @@ const NavBar: React.FC<NavBarProps> = ({ onLogout }) => {
         </div>
 
         <div className="flex flex-col items-center w-10 px-0">
-          {!menuOpen ? (<motion.img
+          {!menuOpen ? (
+            <motion.img
               src={logo}
               animate={{ rotate: 360 }}
               transition={{ duration: 1 }}
               className="w-12 h-12 mb-6"
-            />) : ''}
-            <div className="flex items-center space-x-4">
-              <ExitToApp
-                onClick={handleLogout}
-                className="cursor-pointer text-gray-300 hover:text-red-600 transition-colors duration-300 ml-12"
-                fontSize="large"
-                titleAccess="Sair"
-              />                
-              <span
-                  className={`transition-opacity duration-300 font-bold ${
-                    menuOpen ? 'opacity-100' : 'opacity-0'
-                  }`}
-                >
-                Sair
-              </span>
-            </div>
+            />
+          ) : null}
+          <div className="flex items-center space-x-4">
+            <ExitToApp
+              onClick={handleLogout}
+              className="cursor-pointer text-gray-300 hover:text-red-600 transition-colors duration-300 ml-12"
+              fontSize="large"
+              titleAccess="Sair"
+            />
+            <span
+              className={`transition-opacity duration-300 font-bold ${
+                menuOpen ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              Sair
+            </span>
+          </div>
         </div>
-
       </div>
     </div>
   );

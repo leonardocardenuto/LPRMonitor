@@ -15,7 +15,7 @@ const Home: React.FC = () => {
       <Camera />
       <LastCars />
       <NewPlate />
-      <UnauthorizedCarsTable className='bottom-0 right-0 absolute w-5/12 h-2/5' />
+      <UnauthorizedCarsTable className="bottom-0 right-0 absolute w-5/12 h-2/5" />
     </ProtectedLayout>
   );
 };
