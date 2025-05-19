@@ -1,5 +1,10 @@
 from ..extensions import db
 from datetime import datetime
+from pytz import timezone
+
+def get_sp_time():
+    aware_time = datetime.now(timezone('America/Sao_Paulo'))
+    return aware_time.replace(tzinfo=None)
 
 class HistoricMovementTemp(db.Model):
     __tablename__ = 'historic_movements_temp'
@@ -10,7 +15,7 @@ class HistoricMovementTemp(db.Model):
     to_camera_id = db.Column(db.Integer, nullable=True)
     authorized_by_user_id = db.Column(db.Integer, nullable=True)
     reason = db.Column(db.String, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
+    created_at = db.Column(db.DateTime, default=get_sp_time, nullable=True)
 
     def to_dict(self):
         return {
@@ -20,7 +25,7 @@ class HistoricMovementTemp(db.Model):
             "to_camera_id": self.to_camera_id,
             "authorized_by_user_id": self.authorized_by_user_id,
             "reason": self.reason,
-            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "created_at": self.created_at.isoformat(),
         }
 
     def __repr__(self):
