@@ -13,6 +13,7 @@ const Home: React.FC = () => {
   // State to trigger reloads of components
   const [updateCounter, setUpdateCounter] = useState(0);
 
+
   useEffect(() => {
     const evtSource = new EventSource('http://localhost:5000/stream/');
 

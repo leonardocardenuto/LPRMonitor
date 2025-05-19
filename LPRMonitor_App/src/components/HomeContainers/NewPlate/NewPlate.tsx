@@ -2,25 +2,47 @@ import React, { useEffect, useState } from 'react';
 import { fetchCheckPlateExists } from './fetchCheckPlate';
 import { motion } from 'framer-motion';
 
+
+interface UnauthorizedCar {
+  newPlate: string;
+  time: string;
+  description: string;
+}
+
 interface NewPlateProps {
   updateTrigger?: number;  // optional trigger to re-check plate
 }
 
 const NewPlate: React.FC<NewPlateProps> = ({ updateTrigger }) => {
     const [plateExists, setPlateExists] = useState<boolean | null>(null);
-    const newPlate = "SVU-2G24"; // example plate
     const [triggerAnimation, setTriggerAnimation] = useState(false);
+    const [newPlate, setNewPlate] = useState<string | null>(null);
 
-    // Re-check plate on mount and whenever updateTrigger changes
+
     useEffect(() => {
-        console.log("Verificando a placa:", newPlate);
+
         const checkPlate = async () => {
-            const exists = await fetchCheckPlateExists(newPlate);
-            setPlateExists(exists);
+            try {
+                const response = await fetchCheckPlateExists();
+                console.log(response);
+                if (response && response.plate !== undefined) {
+                    setNewPlate(response.plate);
+                    setPlateExists(response.exists);
+                    console.log("oi");
+                } else {
+                    setNewPlate(null);
+                    setPlateExists(false);
+                }
+
+            } catch (error) {
+                console.error("Erro ao verificar placa:", error);
+                setNewPlate(null);
+                setPlateExists(false);
+            }
         };
 
         checkPlate();
-    }, [updateTrigger]);  // <-- dependency added here
+    }, [updateTrigger]);// <-- dependency added here
 
     useEffect(() => {
         if (plateExists === false) {
