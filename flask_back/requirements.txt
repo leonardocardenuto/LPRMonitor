@@ -16,5 +16,7 @@ python-dotenv==1.1.0
 SQLAlchemy==2.0.40
 typing_extensions==4.13.2
 waitress==3.0.2
-ultralytics==8.3.133pytesseract==0.3.13opencv-python==4.11.0.86
+ultralytics==8.3.133
+pytesseract==0.3.13
+opencv-python==4.11.0.86
 opencv-python-headless==4.11.0.86
