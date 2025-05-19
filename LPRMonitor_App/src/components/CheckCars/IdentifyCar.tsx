@@ -37,7 +37,7 @@ const IdentifyCar: React.FC = () => {
         onSubmit={handleSubmit}
         className="w-auto mx-auto mt-10 bg-white p-6 rounded-2xl shadow-md"
       >
-        <h2 className="text-2xl font-semibold mb-4 text-center">Identify Car</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-center">Identificar Veículo Não Autorizado</h2>
 
         <div className="mb-4">
           <label className="block text-gray-700 mb-1">Plate Name *</label>
