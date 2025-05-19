@@ -49,7 +49,7 @@ const createWindow = async () => {
           "default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval'; " +
           "img-src 'self' data: https: http: blob:; " +
           "media-src 'self' data: https: http: blob:; " +
-          "connect-src 'self' http://localhost:5000 ws://localhost:3000 http://192.168.0.173:8080;"
+          "connect-src 'self' http://localhost:5000 ws://localhost:3000 http://192.168.168.230:8080;"
         ],
       },
     });

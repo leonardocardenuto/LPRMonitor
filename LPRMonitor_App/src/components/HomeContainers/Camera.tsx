@@ -9,7 +9,7 @@ const Camera: React.FC = () => {
         <p className="text-[16px] text-[#888]">{error}</p>
       ) : (
         <img
-          src="http://192.168.0.173:8080/video"
+          src="http://192.168.168.230:8080/video"
           alt="IP Webcam Stream"
           className="w-full h-full object-cover rounded-2xl"
           onError={() => setError('Não foi possível carregar a câmera.')}
