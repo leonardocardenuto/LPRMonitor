@@ -1,6 +1,7 @@
 from ..extensions import db
 from datetime import datetime
 import hashlib
+from pytz import timezone
 
 class Users(db.Model):
     __tablename__ = 'users'
@@ -8,8 +9,8 @@ class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     _password = db.Column("password", db.String(40), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone('America/Sao_Paulo')))
+    updated_at = db.Column(db.DateTime, default=datetime.now(timezone('America/Sao_Paulo')), onupdate=datetime.now(timezone('America/Sao_Paulo')))
     
 
     def __repr__(self):

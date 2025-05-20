@@ -1,5 +1,10 @@
 from ..extensions import db
 from datetime import datetime
+from pytz import timezone
+
+def get_sp_time():
+    aware_time = datetime.now(timezone('America/Sao_Paulo'))
+    return aware_time.replace(tzinfo=None)
 
 class PlateCheck(db.Model):
     __tablename__ = 'car_temp'
@@ -7,7 +12,7 @@ class PlateCheck(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     license_plate = db.Column(db.String, nullable=False)
     description = db.Column(db.String)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=get_sp_time)
     
     def to_dict(self):
         return {

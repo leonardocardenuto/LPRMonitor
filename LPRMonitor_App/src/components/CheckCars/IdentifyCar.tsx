@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import ProtectedLayout from '../ProtectedLayout';
 import { useAuth } from '../../contexts/AuthContext';
+import axios from 'axios';
 
 const statusOptions = [
   { value: 'student', label: 'Aluno' },
@@ -13,12 +14,26 @@ const statusOptions = [
 
 const IdentifyCar: React.FC = () => {
   const [plateName, setPlateName] = useState('');
+  const [availablePlates, setAvailablePlates] = useState<string[]>([]);
   const [status, setStatus] = useState('');
   const [expireDate, setExpireDate] = useState<Dayjs | null>(null);
   const [extraInfo, setExtraInfo] = useState('');
   const [justification, setJustification] = useState('');
 
   const { logout } = useAuth();
+
+  useEffect(() => {
+    const fetchAvailablePlates = async () => {
+      try {
+        const response = await axios.get('/check_plates'); // ajuste a URL se necessário
+        setAvailablePlates(response.data.plates || []);
+      } catch (error) {
+        console.error('Erro ao buscar placas não cadastradas:', error);
+      }
+    };
+
+    fetchAvailablePlates();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,17 +52,23 @@ const IdentifyCar: React.FC = () => {
         onSubmit={handleSubmit}
         className="w-auto mx-auto mt-10 bg-white p-6 rounded-2xl shadow-md"
       >
-        <h2 className="text-2xl font-semibold mb-4 text-center">Identify Car</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-center">Identificar Veículo Não Autorizado</h2>
 
         <div className="mb-4">
           <label className="block text-gray-700 mb-1">Plate Name *</label>
-          <input
-            type="text"
+          <select
             value={plateName}
             onChange={(e) => setPlateName(e.target.value)}
             required
             className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#272932]"
-          />
+          >
+            <option value="">Selecione uma placa</option>
+            {availablePlates.map((plate, index) => (
+              <option key={index} value={plate}>
+                {plate}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="mb-4">
@@ -58,7 +79,7 @@ const IdentifyCar: React.FC = () => {
             required
             className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#272932]"
           >
-            <option value="">Select status</option>
+            <option value="">Selecione o status</option>
             {statusOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}

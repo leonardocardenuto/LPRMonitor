@@ -1,5 +1,10 @@
 from ..extensions import db
 from datetime import datetime
+from pytz import timezone
+
+def get_sp_time():
+    aware_time =    aware_time = datetime.now(timezone('America/Sao_Paulo'))   
+    return aware_time.replace(tzinfo=None)
 
 class Car(db.Model):
     __tablename__ = 'cars'
@@ -7,7 +12,7 @@ class Car(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     license_plate = db.Column(db.String, nullable=False)
     owner_id = db.Column(db.Integer, nullable=True)    
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
+    created_at = db.Column(db.DateTime, default=get_sp_time, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
 
     def to_dict(self):
@@ -15,8 +20,8 @@ class Car(db.Model):
             "id": self.id,
             "license_plate": self.license_plate,
             "owner_id": self.owner_id,
-            "created_at": self.created_at.isoformat() if self.created_at else None,
-            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.created_at.isoformat(),
         }
 
     def __repr__(self):

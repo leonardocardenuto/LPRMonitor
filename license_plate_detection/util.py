@@ -2,11 +2,10 @@ import cv2
 from ultralytics import YOLO
 import re
 from tkinter import Tk, filedialog
-
+import os
 import cv2
 import numpy as np
 import requests
-
 
 def selecionar_video():
     root = Tk()
@@ -54,8 +53,21 @@ def registrar_placa_via_api(placa):
     api_url = "http://127.0.0.1:5000/yolo/register_car"
     headers = {"Content-Type": "application/json"}
     data = {"license_plate": placa}
-
+    print(f"Enviando placa {placa} para API...")
     try:
+        login_url = "http://127.0.0.1:5000/auth/login"
+        login_data = {"name": os.getenv("YOLO_USER"), "password": os.getenv("YOLO_PASS")}
+        try:
+            login_response = requests.post(login_url, json=login_data, headers=headers)
+            login_response.raise_for_status()
+            token = login_response.json().get("token")
+            if not token:
+                raise ValueError("Failed to retrieve access token")
+            headers["Authorization"] = f"Bearer {token}"
+        except requests.exceptions.RequestException as e:
+            print(f"Falha ao obter token de autenticação: {e}")
+            return False
+
         response = requests.post(api_url, json=data, headers=headers)
         response.raise_for_status()
         print(f"API Response: {response.json()}")
@@ -74,8 +86,8 @@ def get_placas():
 
     placas_diferentes = set()
 
-    ip_droidcam = '192.168.0.173' # Colocar o ip do wifi que aparece no app do droidcam
-    cap = cv2.VideoCapture(f'http://{ip_droidcam}:4747/video') 
+    ip_droidcam = os.getenv("IP_CAM") # Colocar o ip do wifi que aparece no app do droidcam
+    cap = cv2.VideoCapture(f'https://{ip_droidcam}/video') 
 
     while True:
         ret, frame = cap.read()

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FaCar, FaHome, FaInfoCircle } from 'react-icons/fa';
 import logo from '../assets/logo_white.png';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ExitToApp } from '@mui/icons-material';
 
 interface NavBarProps {
@@ -12,7 +12,8 @@ interface NavBarProps {
 const NavBar: React.FC<NavBarProps> = ({ onLogout }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
-
+  const location = useLocation();
+  
   const handleLogout = () => {
     onLogout();
     navigate('/login', { replace: true });
@@ -53,35 +54,23 @@ const NavBar: React.FC<NavBarProps> = ({ onLogout }) => {
           <div className="space-y-6 ml-2 mt-6">
             <button onClick={() => navigate('/')}>
               <div className="flex items-center space-x-4">
-                <FaHome className="w-8 h-8" />
+                <FaHome className={`w-8 h-8 ${location.pathname === '/' ? 'text-blue-500' : ''}`} />
                 <span
                   className={`transition-opacity duration-300 font-bold ${
                     menuOpen ? 'opacity-100' : 'opacity-0'
-                  }`}
+                  } ${location.pathname === '/' ? 'text-blue-500' : ''}`}
                 >
                   Home
                 </span>
               </div>
             </button>
-            <button>
-              <div className="flex items-center space-x-4">
-                <FaInfoCircle className="w-8 h-8" />
-                <span
-                  className={`transition-opacity duration-300 font-bold ${
-                    menuOpen ? 'opacity-100' : 'opacity-0'
-                  }`}
-                >
-                  Informações
-                </span>
-              </div>
-            </button>
             <button onClick={() => navigate('/check-unauthorized')}>
               <div className="flex items-center space-x-4">
-                <FaCar className="w-8 h-8" />
+                <FaCar className={`w-8 h-8 ${location.pathname === '/check-unauthorized' ? 'text-blue-500' : ''}`} />
                 <span
                   className={`transition-opacity duration-300 font-bold ${
                     menuOpen ? 'opacity-100' : 'opacity-0'
-                  }`}
+                  } ${location.pathname === '/check-unauthorized' ? 'text-blue-500' : ''}`}
                 >
                   Usuário
                 </span>
