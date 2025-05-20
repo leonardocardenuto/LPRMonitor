@@ -74,7 +74,7 @@ def get_placas():
 
     placas_diferentes = set()
 
-    ip_droidcam = '192.168.0.173' # Colocar o ip do wifi que aparece no app do droidcam
+    ip_droidcam = '192.168.168.230' # Colocar o ip do wifi que aparece no app do droidcam
     cap = cv2.VideoCapture(f'https://{ip_droidcam}:8080/video') 
 
     while True:
