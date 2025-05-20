@@ -47,9 +47,9 @@ def validar_formato(texto, classe):
         return re.fullmatch(r'[A-Z]{3}[0-9][A-Z][0-9]{2}', texto)
     return False
 
-def procurar_veiculo(placa_procurada, ip_droidcam, placa_model, caracteres_model): 
+def procurar_veiculo(placa_procurada, ip_webcam, placa_model, caracteres_model): 
     frame_count = 0   
-    cap = cv2.VideoCapture(f'http://{ip_droidcam}:4747/video') 
+    cap = cv2.VideoCapture(f'http://{ip_webcam}:8080/video') 
 
     while True:
         ret, frame = cap.read()
@@ -96,17 +96,14 @@ def procurar_veiculo(placa_procurada, ip_droidcam, placa_model, caracteres_model
                 
                 if validar_formato(placa_texto, class_name) and todas_confiancas_validas:
                     if placa_texto == placa_procurada:
-                        print(f'Carro com placa {placa_procurada} encontrado na câmera de IP {ip_droidcam}')
+                        print(f'Carro com placa {placa_procurada} encontrado na câmera de IP {ip_webcam}')
                         cap.release()
-                        cv2.destroyAllWindows()
-                        return ip_droidcam
+                        return ip_webcam
 
-        if frame_count >= 200:
-            print(f'Veículo com placa {placa_procurada} **não** encontrado na câmera de IP {ip_droidcam}')
+        if frame_count >= 200: # Um tempo para que o veiculo possa ser procuraado
             break
 
     cap.release()
-    cv2.destroyAllWindows()
     return None
 
 
@@ -123,19 +120,18 @@ def perseguir_veiculo(placa, cameras_de_seguranca):
         for future in as_completed(futures):
             resultado = future.result()
             if resultado is not None:
-                print(f"Veículo encontrado! IP: {resultado}")
                 return True  
 
     return False 
 
-def get_placas(ip_droidcam):
+def get_placas(ip_webcam):
     placa_model = YOLO('../yolo_model/plate_detection.pt')                
     caracteres_model = YOLO('../yolo_model/character_detection.pt')   
     
     frame_count = 0   
-    placas_diferentes = set()
+    placas_diferentes = []
 
-    cap = cv2.VideoCapture(f'http://{ip_droidcam}:4747/video') 
+    cap = cv2.VideoCapture(f'http://{ip_webcam}:8080/video') 
 
     while True:
         ret, frame = cap.read()
@@ -143,12 +139,10 @@ def get_placas(ip_droidcam):
             print("Falha ao capturar frame. Saindo...")
             break
         
-        frame_count += 1
-        if frame_count % 4 != 0:
+        frame_count += 2
+        if frame_count % 2 != 0:
             cv2.imshow('Leitor de Placas', frame)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-            continue
+            key = cv2.waitKey(1) & 0xFF
         
         placas_result = placa_model(frame, verbose=False)
 
@@ -185,25 +179,26 @@ def get_placas(ip_droidcam):
                 
                 if validar_formato(placa_texto, class_name) and todas_confiancas_validas:
                     if placa_texto not in placas_diferentes:
-                        print(f"Placa detectada: {placa_texto}")
-                        placas_diferentes.add(placa_texto)
-                        resposta = input("Você deseja rastrear esse veículo? (y/n) ").lower()
-                        if resposta == 'y':
-                            cap.release()
-                            cv2.destroyAllWindows()
-                            time.sleep(1)
-                            perseguir_veiculo(placa_texto, ['192.168..', '192.168..'])
+                        placas_diferentes.append(placa_texto)
+                        print("\nPlacas detectadas:")
+                        for i, placa in enumerate(placas_diferentes):
+                            print(f"{i}: {placa}")
 
                     cv2.putText(frame, placa_texto, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
 
         cv2.imshow('Leitor de Placas', frame)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('q'):
             break
+        elif ord('0') <= key <= ord('9'):
+            idx = key - ord('0')
+            if idx < len(placas_diferentes):
+                print(f"Iniciando rastreamento para a placa: {placas_diferentes[idx]}")
+                perseguir_veiculo(placas_diferentes[idx], ['192.168.15.53', '192.168.15.39'])
 
     cap.release()
     cv2.destroyAllWindows()
     return placas_diferentes
 
-
-get_placas('192.168.')
+get_placas('192.168.15.53')
