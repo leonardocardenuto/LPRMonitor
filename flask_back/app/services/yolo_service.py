@@ -25,7 +25,6 @@ def handle_register_car_movement(license_plate, owner_id=None, from_camera_id=No
                 car_id=car.id,
                 from_camera_id=from_camera_id,
                 to_camera_id=1,
-                created_at=datetime.utcnow()
             )
             db.session.add(movement)
             db.session.commit()
@@ -38,7 +37,6 @@ def handle_register_car_movement(license_plate, owner_id=None, from_camera_id=No
                 car_temp_id=temp_car.id,
                 from_camera_id=from_camera_id,
                 to_camera_id=1,
-                created_at=datetime.utcnow()
             )
             db.session.add(movement_temp)
             db.session.commit()
@@ -55,7 +53,6 @@ def handle_register_car_movement(license_plate, owner_id=None, from_camera_id=No
             car_temp_id=new_temp_car.id,
             from_camera_id=from_camera_id,
             to_camera_id=1,
-            created_at=datetime.utcnow()
         )
         db.session.add(movement_temp)
         db.session.commit()

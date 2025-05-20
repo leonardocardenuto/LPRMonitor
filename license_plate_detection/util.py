@@ -2,11 +2,10 @@ import cv2
 from ultralytics import YOLO
 import re
 from tkinter import Tk, filedialog
-
+import os
 import cv2
 import numpy as np
 import requests
-
 
 def selecionar_video():
     root = Tk()
@@ -74,8 +73,8 @@ def get_placas():
 
     placas_diferentes = set()
 
-    ip_droidcam = '192.168.168.230' # Colocar o ip do wifi que aparece no app do droidcam
-    cap = cv2.VideoCapture(f'https://{ip_droidcam}:8080/video') 
+    ip_droidcam = os.getenv("IP_CAM") # Colocar o ip do wifi que aparece no app do droidcam
+    cap = cv2.VideoCapture(f'https://{ip_droidcam}/video') 
 
     while True:
         ret, frame = cap.read()

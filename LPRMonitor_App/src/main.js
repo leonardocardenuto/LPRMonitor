@@ -1,6 +1,9 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('node:path');
 const http = require('http');
+require('dotenv').config();
+
+const ipCamUrl = process.env.VITE_IP_CAM;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -46,10 +49,10 @@ const createWindow = async () => {
       responseHeaders: {
         ...details.responseHeaders,
         'Content-Security-Policy': [
-          "default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval'; " +
-          "img-src 'self' data: https: http: blob:; " +
-          "media-src 'self' data: https: http: blob:; " +
-          "connect-src 'self' http://localhost:5000 ws://localhost:3000 http://192.168.168.230:8080;"
+          `default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval'; ` +
+          `img-src 'self' data: https: http: blob:; ` +
+          `media-src 'self' data: https: http: blob:; ` +
+          `connect-src 'self' http://localhost:5000 ws://localhost:3000 http://${ipCamUrl}:8080;`
         ],
       },
     });
