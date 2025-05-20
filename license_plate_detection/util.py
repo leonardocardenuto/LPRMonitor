@@ -7,6 +7,10 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 import numpy as np
 import requests
+from dotenv import load_dotenv
+
+dotenv_path = os.path.join(os.path.dirname(__file__), '..', 'flask_back', '.env')
+load_dotenv(dotenv_path)
 
 def selecionar_video():
     root = Tk()
@@ -162,6 +166,12 @@ def get_placas():
     placas_diferentes = []
     
     ip_webcam = os.getenv("IP_CAM") 
+    lista_ip_webcam = os.getenv("LISTA_IP_WEBCAM")
+    if lista_ip_webcam:
+        lista_ip = lista_ip_webcam.split(",") 
+    else:
+        lista_ip = []
+        
     cap = cv2.VideoCapture(f'http://{ip_webcam}:8080/video') 
 
 
@@ -229,7 +239,7 @@ def get_placas():
             idx = key - ord('0')
             if idx < len(placas_diferentes):
                 print(f"Iniciando rastreamento para a placa: {placas_diferentes[idx]}")
-                perseguir_veiculo(placas_diferentes[idx], ['192.168.15.53', '192.168.15.39'])
+                perseguir_veiculo(placas_diferentes[idx], lista_ip)
 
     cap.release()
     cv2.destroyAllWindows()
