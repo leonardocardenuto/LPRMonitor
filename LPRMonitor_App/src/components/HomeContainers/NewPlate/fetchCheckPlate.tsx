@@ -9,7 +9,16 @@ interface PlateCheckResponse {
 
 export const fetchCheckPlateExists = async (): Promise<PlateCheckResponse | null> => {
   try {
-    const response = await axios.post(API_URL);
+    const token = localStorage.getItem('token'); 
+    const response = await axios.post(
+        `${API_URL}`,
+        {},
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
     return response.data; // onde `data` contém { plate, exists }
   } catch (error: any) {
     console.error('Erro na verificação da placa:', error.response?.data?.error || error.message);

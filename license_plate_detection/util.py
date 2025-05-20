@@ -55,6 +55,19 @@ def registrar_placa_via_api(placa):
     data = {"license_plate": placa}
     print(f"Enviando placa {placa} para API...")
     try:
+        login_url = "http://127.0.0.1:5000/auth/login"
+        login_data = {"name": os.getenv("YOLO_USER"), "password": os.getenv("YOLO_PASS")}
+        try:
+            login_response = requests.post(login_url, json=login_data, headers=headers)
+            login_response.raise_for_status()
+            token = login_response.json().get("token")
+            if not token:
+                raise ValueError("Failed to retrieve access token")
+            headers["Authorization"] = f"Bearer {token}"
+        except requests.exceptions.RequestException as e:
+            print(f"Falha ao obter token de autenticação: {e}")
+            return False
+
         response = requests.post(api_url, json=data, headers=headers)
         response.raise_for_status()
         print(f"API Response: {response.json()}")
