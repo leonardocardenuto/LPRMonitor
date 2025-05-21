@@ -4,6 +4,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import ProtectedLayout from '../ProtectedLayout';
 import { useAuth } from '../../contexts/AuthContext';
 import axios from 'axios';
+import { fetchUnverifiedPlates } from './fetchIdentifyCars';
 
 const statusOptions = [
   { value: 'student', label: 'Aluno' },
@@ -14,7 +15,7 @@ const statusOptions = [
 
 const IdentifyCar: React.FC = () => {
   const [plateName, setPlateName] = useState('');
-  const [availablePlates, setAvailablePlates] = useState<string[]>([]);
+  const [availablePlates, setPlates] = useState<string[]>([]);
   const [status, setStatus] = useState('');
   const [expireDate, setExpireDate] = useState<Dayjs | null>(null);
   const [extraInfo, setExtraInfo] = useState('');
@@ -22,18 +23,16 @@ const IdentifyCar: React.FC = () => {
 
   const { logout } = useAuth();
 
-  useEffect(() => {
-    const fetchAvailablePlates = async () => {
-      try {
-        const response = await axios.get('/check_plates'); // ajuste a URL se necessário
-        setAvailablePlates(response.data.plates || []);
-      } catch (error) {
-        console.error('Erro ao buscar placas não cadastradas:', error);
+    useEffect(() => {
+      async function loadPlates() {
+        const data = await fetchUnverifiedPlates();
+        if (data && data.plates) {
+          setPlates(data.plates);
+        }
       }
-    };
 
-    fetchAvailablePlates();
-  }, []);
+      loadPlates();
+    }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,11 +49,11 @@ const IdentifyCar: React.FC = () => {
     <ProtectedLayout onLogout={logout}>
       <form
         onSubmit={handleSubmit}
-        className="w-auto mx-auto mt-10 bg-white p-6 rounded-2xl shadow-md"
+        className="w-auto mx-auto mt-10 p-6 rounded-2xl"
       >
         <h2 className="text-2xl font-semibold mb-4 text-center">Identificar Veículo Não Autorizado</h2>
 
-        <div className="mb-4">
+        <div className="mb-4 shadow-md bg-white rounded-md p-4">
           <label className="block text-gray-700 mb-1">Plate Name *</label>
           <select
             value={plateName}
@@ -71,7 +70,7 @@ const IdentifyCar: React.FC = () => {
           </select>
         </div>
 
-        <div className="mb-4">
+        <div className="mb-4 shadow-md bg-white rounded-md p-4">
           <label className="block text-gray-700 mb-1">Status *</label>
           <select
             value={status}
@@ -89,7 +88,7 @@ const IdentifyCar: React.FC = () => {
         </div>
 
         {(status === 'student' || status === 'familiars') && (
-          <div className="mb-4">
+          <div className="mb-4 shadow-md bg-white rounded-md p-4">
             <label className="block text-gray-700 mb-1">Extra Info *</label>
             <input
               type="text"
@@ -101,9 +100,9 @@ const IdentifyCar: React.FC = () => {
           </div>
         )}
 
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-1">Expire Date *</label>
-          <DatePicker
+        <div className="mb-4 shadow-md bg-white rounded-md p-4">
+          <label className="block text-gray-700 mb-1 ">Expire Date *</label>
+          <DatePicker 
             value={expireDate}
             onChange={setExpireDate}
             format="DD/MM/YYYY"
@@ -117,7 +116,7 @@ const IdentifyCar: React.FC = () => {
           />
         </div>
 
-        <div className="mb-4">
+        <div className="mb-4 shadow-md bg-white rounded-md p-4">
           <label className="block text-gray-700 mb-1">Justification *</label>
           <textarea
             value={justification}
