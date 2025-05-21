@@ -9,6 +9,9 @@ import {
 } from '@tanstack/react-table';
 import { fetchLastUnauthorizedCars } from './services/UnauthorizedCarsService';
 import CircularProgress from '@mui/material/CircularProgress';
+import { useNavigate } from 'react-router-dom';
+import useToast from '../../../hooks/useToast';
+import { handleUnauthorized } from '../../../utils/authUtils';
 
 interface UnauthorizedCar {
     plate: string;
@@ -40,7 +43,8 @@ const UnauthorizedCarsTable: React.FC<UnauthorizedCarsTableProps> = ({ className
     const [data, setData] = useState<UnauthorizedCar[]>([]);
     const [sorting, setSorting] = useState<SortingState>([]);
     const [loading, setLoading] = useState<boolean>(true);
-
+    const navigate = useNavigate();
+    
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
@@ -53,6 +57,9 @@ const UnauthorizedCarsTable: React.FC<UnauthorizedCarsTableProps> = ({ className
                 }));
                 setData(transformed);
             } catch (error) {
+                if (error instanceof Error && (error as any).response && (error as any).response.status === 401) {
+                    handleUnauthorized(error, navigate);
+                }   
                 console.error('Error fetching unauthorized cars:', error);
                 setData([]);
             } finally {

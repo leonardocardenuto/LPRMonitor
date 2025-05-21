@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { fetchCheckPlateExists } from './fetchCheckPlate';
 import { motion } from 'framer-motion';
+import { handleUnauthorized } from '../../../utils/authUtils';
+import { useNavigate } from 'react-router-dom';
 
 
 interface UnauthorizedCar {
@@ -17,6 +19,7 @@ const NewPlate: React.FC<NewPlateProps> = ({ updateTrigger }) => {
     const [plateExists, setPlateExists] = useState<boolean | null>(null);
     const [triggerAnimation, setTriggerAnimation] = useState(false);
     const [newPlate, setNewPlate] = useState<string | null>(null);
+    const navigate = useNavigate();
 
 
     useEffect(() => {
@@ -35,7 +38,9 @@ const NewPlate: React.FC<NewPlateProps> = ({ updateTrigger }) => {
                 }
 
             } catch (error) {
-                console.error("Erro ao verificar placa:", error);
+                if (error instanceof Error && (error as any).response && (error as any).response.status === 401) {
+                    handleUnauthorized(error, navigate);
+                }                
                 setNewPlate(null);
                 setPlateExists(false);
             }

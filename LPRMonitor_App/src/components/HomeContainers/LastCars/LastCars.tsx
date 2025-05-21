@@ -9,6 +9,9 @@ import {
 } from '@tanstack/react-table';
 import { fetchLastCars } from './services/LastCarsService';
 import CircularProgress from '@mui/material/CircularProgress';
+import { useNavigate } from 'react-router-dom';
+import useToast from '../../../hooks/useToast';
+import { handleUnauthorized } from '../../../utils/authUtils';
 
 interface LastCar {
     plate: string;
@@ -39,7 +42,8 @@ const LastCarsTable: React.FC<LastCarsTableProps> = ({ updateTrigger }) => {
     const [data, setData] = useState<LastCar[]>([]);
     const [sorting, setSorting] = useState<SortingState>([]);
     const [loading, setLoading] = useState<boolean>(true);
-
+    const navigate = useNavigate();
+    
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
@@ -52,7 +56,9 @@ const LastCarsTable: React.FC<LastCarsTableProps> = ({ updateTrigger }) => {
                 }));
                 setData(transformed);
             } catch (error) {
-                console.error('Error fetching last cars:', error);
+                if (error instanceof Error && (error as any).response && (error as any).response.status === 401) {
+                    handleUnauthorized(error, navigate);
+                }   
                 setData([]); 
             } finally {
                 setLoading(false); 
