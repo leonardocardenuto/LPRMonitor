@@ -4,7 +4,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import ProtectedLayout from '../ProtectedLayout';
 import { useAuth } from '../../contexts/AuthContext';
 import axios from 'axios';
-import { fetchUnverifiedPlates } from './fetchIdentifyCars';
+import { fetchCarAuthorization, fetchUnverifiedPlates } from './fetchIdentifyCars';
 
 const statusOptions = [
   { value: 'student', label: 'Aluno' },
@@ -35,14 +35,8 @@ const IdentifyCar: React.FC = () => {
     }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log({
-      plateName,
-      status,
-      expireDate: expireDate?.format('DD/MM/YYYY'),
-      extraInfo: (status === 'student' || status === 'familiars') ? extraInfo : null,
-      justification,
-    });
+      e.preventDefault();
+
   };
 
   return (

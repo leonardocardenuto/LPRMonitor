@@ -21,3 +21,29 @@ export const fetchUnverifiedPlates = async (): Promise<UnverifiedPlatesResponse 
     return null;
   }
 };
+
+interface CarAuthorizationData {
+  license_plate_id: string;
+  valid_until: string; // formato ISO, ex: "2025-05-20T23:59:00"
+  justification?: string;
+  status?: string;
+  extra_info?: string;
+}
+
+export const fetchCarAuthorization = async (data: CarAuthorizationData): Promise<boolean> => {
+  try {
+    const token = localStorage.getItem('token');
+
+    await axios.post(API_URL, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    return true;
+  } catch (error: any) {
+    console.error('Erro ao criar autorização:', error.response?.data || error.message);
+    return false;
+  }
+};
