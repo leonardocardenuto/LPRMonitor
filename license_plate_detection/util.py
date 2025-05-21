@@ -83,7 +83,7 @@ def registrar_placa_via_api(placa):
 
 def procurar_veiculo(placa_procurada, ip_webcam, placa_model, caracteres_model): 
     frame_count = 0   
-    cap = cv2.VideoCapture(f'http://{ip_webcam}:8080/video') 
+    cap = cv2.VideoCapture(f'http://{ip_webcam}/video') 
 
     while True:
         ret, frame = cap.read()
@@ -172,8 +172,7 @@ def get_placas():
     else:
         lista_ip = []
         
-    cap = cv2.VideoCapture(f'http://{ip_webcam}:8080/video') 
-
+    cap = cv2.VideoCapture(f'http://{ip_webcam}/video') 
 
     while True:
         ret, frame = cap.read()
@@ -183,7 +182,10 @@ def get_placas():
         
         frame_count += 2
         if frame_count % 2 != 0:
-            cv2.imshow('Leitor de Placas', frame)
+            frame_resized = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+            
+            cv2.imshow('Leitor de Placas', frame_resized)
+        
             key = cv2.waitKey(1) & 0xFF
         
         placas_result = placa_model(frame, verbose=False)
