@@ -16,9 +16,9 @@ def create_app():
 
     @app.before_request
     def check_jwt_token():
-        public_paths = ['auth/login']
+        public_paths = ['auth/login','auth/register']
 
-        if app.config['FLASK_ENV'] == 'development' and "auth/register" in request.path:
+        if app.config['FLASK_ENV'] != 'development' and "auth/register" in request.path:
             return DoResponse.unauthorized()
 
         if any(path in request.path for path in public_paths) or request.method == "OPTIONS":
