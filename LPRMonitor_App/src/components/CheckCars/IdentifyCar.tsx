@@ -4,6 +4,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import ProtectedLayout from '../ProtectedLayout';
 import { useAuth } from '../../contexts/AuthContext';
 import axios from 'axios';
+import { fetchUnverifiedPlates } from './fetchIdentifyCars';
 
 const statusOptions = [
   { value: 'student', label: 'Aluno' },
@@ -14,7 +15,7 @@ const statusOptions = [
 
 const IdentifyCar: React.FC = () => {
   const [plateName, setPlateName] = useState('');
-  const [availablePlates, setAvailablePlates] = useState<string[]>([]);
+  const [availablePlates, setPlates] = useState<string[]>([]);
   const [status, setStatus] = useState('');
   const [expireDate, setExpireDate] = useState<Dayjs | null>(null);
   const [extraInfo, setExtraInfo] = useState('');
@@ -22,18 +23,16 @@ const IdentifyCar: React.FC = () => {
 
   const { logout } = useAuth();
 
-  useEffect(() => {
-    const fetchAvailablePlates = async () => {
-      try {
-        const response = await axios.get('/check_plates'); // ajuste a URL se necessário
-        setAvailablePlates(response.data.plates || []);
-      } catch (error) {
-        console.error('Erro ao buscar placas não cadastradas:', error);
+    useEffect(() => {
+      async function loadPlates() {
+        const data = await fetchUnverifiedPlates();
+        if (data && data.plates) {
+          setPlates(data.plates);
+        }
       }
-    };
 
-    fetchAvailablePlates();
-  }, []);
+      loadPlates();
+    }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
