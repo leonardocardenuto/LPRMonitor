@@ -49,7 +49,7 @@ chmod +x ./lpr
  ```bash
 cd LPRMonitor_App/
 npm install
-npm run 
+npm run dev
 ```
 
 
