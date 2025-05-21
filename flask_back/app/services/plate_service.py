@@ -41,3 +41,18 @@ def get_last_plates():
         return [plate.to_dict() for plate in plates] 
     except Exception as e:
         raise PlateServiceError(f"Error retrieving plates: {str(e)}", code=500)
+    
+def get_all_unverified_plates():
+    try:
+        # Pegando todas as placas únicas com apenas 1 ocorrência (ou alguma lógica que defina 'não verificada')
+        plates = (
+            db.session.query(PlateCheck.license_plate)
+            .group_by(PlateCheck.license_plate)
+            .having(db.func.count(PlateCheck.license_plate) == 1)
+            .all()
+        )
+
+        return [plate[0] for plate in plates]
+
+    except Exception as e:
+        raise PlateServiceError(f"Erro ao buscar placas não verificadas: {str(e)}", code=500)
