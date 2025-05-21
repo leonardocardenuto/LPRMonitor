@@ -37,25 +37,19 @@ chmod +x ./lpr
 ```bash
 ./lpr run
 ```
-
-### ⚠️  
-### Para testar o modelo:
-#### • Crie e ative um ambiente virtual
-```bash
-python -m venv venv
-venv/Scripts/activate  # No Windows
-```
-#### ou
-```bash
-source venv/bin/activate  # No Linux/macOS
+- Em outro terminal bash
+ ```bash
+./lpr yolo
 ```
 
-#### • Instale as dependências necessárias
-```bash
-pip install ultralytics
+### 3. Rodar front-end
+
+> Abra um novo terminal bash
+
+ ```bash
+cd LPRMonitor_App/
+npm install
+npm run 
 ```
 
-#### • Execute o script de teste
-```bash
-python test.py
-```
+
