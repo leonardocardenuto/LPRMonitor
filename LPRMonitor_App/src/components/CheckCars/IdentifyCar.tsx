@@ -49,11 +49,11 @@ const IdentifyCar: React.FC = () => {
     <ProtectedLayout onLogout={logout}>
       <form
         onSubmit={handleSubmit}
-        className="w-auto mx-auto mt-10 bg-white p-6 rounded-2xl shadow-md"
+        className="w-auto mx-auto mt-10 p-6 rounded-2xl"
       >
         <h2 className="text-2xl font-semibold mb-4 text-center">Identificar Veículo Não Autorizado</h2>
 
-        <div className="mb-4">
+        <div className="mb-4 shadow-md bg-white rounded-md p-4">
           <label className="block text-gray-700 mb-1">Plate Name *</label>
           <select
             value={plateName}
@@ -70,7 +70,7 @@ const IdentifyCar: React.FC = () => {
           </select>
         </div>
 
-        <div className="mb-4">
+        <div className="mb-4 shadow-md bg-white rounded-md p-4">
           <label className="block text-gray-700 mb-1">Status *</label>
           <select
             value={status}
@@ -88,7 +88,7 @@ const IdentifyCar: React.FC = () => {
         </div>
 
         {(status === 'student' || status === 'familiars') && (
-          <div className="mb-4">
+          <div className="mb-4 shadow-md bg-white rounded-md p-4">
             <label className="block text-gray-700 mb-1">Extra Info *</label>
             <input
               type="text"
@@ -100,9 +100,9 @@ const IdentifyCar: React.FC = () => {
           </div>
         )}
 
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-1">Expire Date *</label>
-          <DatePicker
+        <div className="mb-4 shadow-md bg-white rounded-md p-4">
+          <label className="block text-gray-700 mb-1 ">Expire Date *</label>
+          <DatePicker 
             value={expireDate}
             onChange={setExpireDate}
             format="DD/MM/YYYY"
@@ -116,7 +116,7 @@ const IdentifyCar: React.FC = () => {
           />
         </div>
 
-        <div className="mb-4">
+        <div className="mb-4 shadow-md bg-white rounded-md p-4">
           <label className="block text-gray-700 mb-1">Justification *</label>
           <textarea
             value={justification}
