@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Box, Button, CircularProgress, Paper, TextField, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, IconButton, InputAdornment, Paper, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
 import logo from '../assets/logo_white.png';
 import useToast from '../hooks/useToast'; 
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const MotionLogo = motion.img;
 
@@ -15,7 +16,8 @@ const Login: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const toast = useToast(); 
-
+  const [showPassword, setShowPassword] = useState(false);
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -98,7 +100,7 @@ const Login: React.FC = () => {
             />
             <TextField
               label="Senha"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               fullWidth
               required
               margin="normal"
@@ -106,6 +108,19 @@ const Login: React.FC = () => {
               onChange={(e) => setSenha(e.target.value)}
               autoComplete="current-password"
               slotProps={{ htmlInput: { className: 'focus:outline-none focus:ring-0' } }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      edge="end"
+                      aria-label="toggle password visibility"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
             <Button
               type="submit"
