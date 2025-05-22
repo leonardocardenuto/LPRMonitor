@@ -253,5 +253,3 @@ def get_placas():
     cap.release()
     cv2.destroyAllWindows()
     return placas_diferentes
-
-get_placas()

@@ -122,8 +122,8 @@ run_app() {
 
 run_yolo() {
   activate_venv
-  log_info "Rodando YOLO..."
-  (cd "$YOLO_DIR_ABS" && export PYTHONPATH="$YOLO_DIR_ABS:$PYTHONPATH" && python util.py)
+  log_info "Executando YOLO (função get_placas)..."
+  (cd "$YOLO_DIR_ABS" && export PYTHONPATH="$YOLO_DIR_ABS:$PYTHONPATH" && python -c "from util import get_placas; get_placas()")
 }
 
 migrate_db() {
