@@ -223,7 +223,7 @@ def get_placas():
                     caracteres_ordenados = sorted(caracteres_detectados, key=lambda c: c['x1'])
                     placa_texto = corrigir_formato(''.join([c['label'] for c in caracteres_ordenados]), class_name)
 
-                    todas_confiancas_validas = all(c['score'] >= 0.7 for c in caracteres_ordenados)
+                    todas_confiancas_validas = all(c['score'] >= 0.85 for c in caracteres_ordenados)
 
                     if validar_formato(placa_texto, class_name) and todas_confiancas_validas:
                         if placa_texto not in placas_diferentes:

@@ -10,7 +10,6 @@ import {
 import { fetchLastCars } from './services/LastCarsService';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from 'react-router-dom';
-import useToast from '../../../hooks/useToast';
 import { handleUnauthorized } from '../../../utils/authUtils';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
@@ -26,26 +25,45 @@ interface LastCarsTableProps {
   updateTrigger?: number;
 }
 
-const columns: ColumnDef<LastCar>[] = [
-  {
-    header: 'Placa',
-    accessorKey: 'plate',
-  },
-  {
-    header: 'Hora da Detecção',
-    accessorKey: 'time',
-  },
-  {
-    header: 'Descrição',
-    accessorKey: 'description',
-  },
-];
-
 const LastCarsTable: React.FC<LastCarsTableProps> = ({ updateTrigger }) => {
   const [data, setData] = useState<LastCar[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [activePlate, setActivePlate] = useState<string | null>(null); 
   const navigate = useNavigate();
+
+  const columns: ColumnDef<LastCar>[] = [
+    {
+      header: 'Placa',
+      accessorKey: 'plate',
+    },
+    {
+      header: 'Hora da Detecção',
+      accessorKey: 'time',
+    },
+    {
+      header: '',
+      accessorKey: 'follow',
+      cell: ({ row }) => {
+        const plate = row.original.plate;
+        const isActive = activePlate === plate;
+
+        return (
+          <button
+            onClick={() => setActivePlate(isActive ? null : plate)}
+            className={`${
+              isActive
+                ? 'bg-blue-300 hover:bg-blue-400'
+                : 'bg-gray-300 hover:bg-gray-400'
+            } text-center px-3 py-1 rounded-md text-sm font-semibold text-gray-700`}
+          >
+            {isActive ? 'Perseguindo...' : 'Perseguir Veículo'}
+          </button>
+        );
+      },
+      enableSorting: false,
+    },
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -104,26 +122,38 @@ const LastCarsTable: React.FC<LastCarsTableProps> = ({ updateTrigger }) => {
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
                     const isSorted = header.column.getIsSorted();
+                    const isFollowColumn = header.column.id === 'follow';
+
                     return (
                       <th
                         key={header.id}
-                        className="text-center px-4 py-3 border-b font-semibold text-gray-700 cursor-pointer select-none"
-                        onClick={header.column.getToggleSortingHandler()}
+                        className={`text-center px-4 py-3 border-b font-semibold text-gray-700 ${
+                          isFollowColumn ? '' : 'cursor-pointer select-none'
+                        }`}
+                        onClick={
+                          isFollowColumn
+                            ? undefined
+                            : header.column.getToggleSortingHandler()
+                        }
                       >
                         <div className="flex items-center justify-center gap-1">
                           {flexRender(
                             header.column.columnDef.header,
                             header.getContext()
                           )}
-                          <span>
-                            {isSorted === 'asc' ? (
-                              <ArrowUpwardIcon sx={{ fontSize: 16 }} />
-                            ) : isSorted === 'desc' ? (
-                              <ArrowDownwardIcon sx={{ fontSize: 16 }} />
-                            ) : (
-                              <SwapVertIcon sx={{ fontSize: 16, opacity: 0.5 }} />
-                            )}
-                          </span>
+                          {!isFollowColumn && (
+                            <span>
+                              {isSorted === 'asc' ? (
+                                <ArrowUpwardIcon sx={{ fontSize: 16 }} />
+                              ) : isSorted === 'desc' ? (
+                                <ArrowDownwardIcon sx={{ fontSize: 16 }} />
+                              ) : (
+                                <SwapVertIcon
+                                  sx={{ fontSize: 16, opacity: 0.5 }}
+                                />
+                              )}
+                            </span>
+                          )}
                         </div>
                       </th>
                     );
@@ -135,14 +165,19 @@ const LastCarsTable: React.FC<LastCarsTableProps> = ({ updateTrigger }) => {
               {table.getRowModel().rows.map((row, i) => (
                 <tr
                   key={row.id}
-                  className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50 hover:bg-gray-100'}
+                  className={`${
+                    i % 2 === 0 ? 'bg-white' : 'bg-gray-50 hover:bg-gray-100'
+                  }`}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td
                       key={cell.id}
                       className="text-center px-4 py-2 border-b text-gray-800"
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </td>
                   ))}
                 </tr>
