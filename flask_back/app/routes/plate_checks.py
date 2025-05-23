@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.services.plate_service import check_last_plate_exists, get_all_unverified_plates, get_last_plates, PlateServiceError
+from app.services.plate_service import check_last_plate_exists, create_authorization, get_all_unverified_plates, get_last_plates, PlateServiceError, register_authorization
 from app.utils.response_manager import ResponseManager as DoResponse
 
 check_plate_bp = Blueprint('check_plate', __name__, url_prefix='/check_plate')
@@ -51,4 +51,17 @@ def get_unverified_plates():
         return DoResponse.with_code(e.code, e.message)
     except Exception as e:
         return DoResponse.internal_server_error(str(e))
+    
+@check_plate_bp.route('/car_authorizations', methods=['POST'])
+def create_authorization():
+    data = request.get_json()
 
+    required = ['license_plate_id', 'valid_until']
+    if not all(field in data for field in required):
+        return jsonify({'error': 'Campos obrigatórios ausentes'}), 400
+
+    try:
+        auth = register_authorization(data)
+        return jsonify({'message': 'Autorização registrada com sucesso', 'data': auth}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
