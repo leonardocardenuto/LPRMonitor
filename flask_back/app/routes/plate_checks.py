@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.services.plate_service import check_last_plate_exists, create_authorization, get_all_unverified_plates, get_last_plates, PlateServiceError, register_authorization
+from app.services.plate_service import check_last_plate_exists, get_all_unverified_plates, get_last_plates, PlateServiceError
 from app.utils.response_manager import ResponseManager as DoResponse
 
 check_plate_bp = Blueprint('check_plate', __name__, url_prefix='/check_plate')

@@ -3,7 +3,6 @@ from app.models.PlateCheck import PlateCheck
 from app.extensions import db
 from flask import jsonify
 
-from flask_back.app.routes.plate_checks import create_car_authorization
 
 class PlateServiceError(Exception):
     def __init__(self, message, code=400):
@@ -59,7 +58,3 @@ def get_all_unverified_plates():
 
     except Exception as e:
         raise PlateServiceError(f"Erro ao buscar placas não verificadas: {str(e)}", code=500)
-
-def register_authorization(data):
-    # Aqui você pode incluir validações de regra de negócio, se necessário
-    return create_car_authorization(data)
