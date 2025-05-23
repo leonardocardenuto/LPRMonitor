@@ -23,7 +23,6 @@ def check_plate():
     except Exception as e:
         return DoResponse.internal_server_error(str(e))
 
-
 @check_plate_bp.route('/get_last_plates', methods=['GET'])
 def get_last_plates_route():
     try:

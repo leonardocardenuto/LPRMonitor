@@ -15,7 +15,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const evtSource = new EventSource(`http://localhost:5000/stream/?token=${token}`);
+    const evtSource = new EventSource(`http://localhost:5000/stream?token=${token}`);
     
     evtSource.onmessage = (event) => {
       console.log('SSE message received:', event.data);
