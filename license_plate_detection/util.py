@@ -77,20 +77,38 @@ def registrar_placa_via_api(placa):
         print(f"Falha ao enviar placa para API: {e}")
         return False
     
+def registrar_local_via_api(placa, ipcamera):
+    """
+    Envia uma solicitação para registrar em qual camera a placa esta via API.
+    """
+    api_url = "http://127.0.0.1:5000/yolo/register_car"
+    headers = {"Content-Type": "application/json"}
+    data = {"license_plate": placa}
+    print(f"Enviando placa {placa} para API...")
+    try:
+        login_url = "http://127.0.0.1:5000/auth/login"
+        login_data = {"name": os.getenv("YOLO_USER"), "password": os.getenv("YOLO_PASS")}
+        try:
+            login_response = requests.post(login_url, json=login_data, headers=headers)
+            login_response.raise_for_status()
+            token = login_response.json().get("token")
+            if not token:
+                raise ValueError("Failed to retrieve access token")
+            headers["Authorization"] = f"Bearer {token}"
+        except requests.exceptions.RequestException as e:
+            print(f"Falha ao obter token de autenticação: {e}")
+            return False
+
+        response = requests.post(api_url, json=data, headers=headers)
+        response.raise_for_status()
+        print(f"API Response: {response.json()}")
+        return True
+    except requests.exceptions.RequestException as e:
+        print(f"Falha ao enviar placa para API: {e}")
+        return False
+    
 def enviar_localizacao_veiculo():
     print("Veiculo placa XXXX na camera Y")
-
-import os
-import cv2
-import time
-import threading
-from ultralytics import YOLO
-from concurrent.futures import ThreadPoolExecutor, as_completed
-
-
-placas_detectadas = {} 
-lock = threading.Lock()
-
 
 def procurar_veiculo(placa, cameras_de_seguranca, placa_model, caracteres_model):
 
