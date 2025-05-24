@@ -23,6 +23,7 @@ def upgrade():
     sa.Column('license_plate', sa.String(), nullable=False),
     sa.Column('description', sa.String(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('last_seen_in', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('cars',

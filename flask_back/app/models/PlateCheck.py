@@ -13,13 +13,15 @@ class PlateCheck(db.Model):
     license_plate = db.Column(db.String, nullable=False)
     description = db.Column(db.String)
     created_at = db.Column(db.DateTime, default=get_sp_time)
+    last_seen_in = db.Column(db.String)
     
     def to_dict(self):
         return {
             "id": self.id,
             "license_plate": self.license_plate,
             "description": self.description,
-            "created_at": self.created_at.isoformat()
+            "created_at": self.created_at.isoformat(),
+            "last_seen_in": self.last_seen_in
         }
 
     def __repr__(self):
