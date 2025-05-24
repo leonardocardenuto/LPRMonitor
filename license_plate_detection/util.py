@@ -47,13 +47,14 @@ def validar_formato(texto, classe):
         return re.fullmatch(r'[A-Z]{3}[0-9][A-Z][0-9]{2}', texto)
     return False
 
-def registrar_placa_via_api(placa):
+def registrar_placa_via_api(placa, ipcamera):
     """
     Envia uma solicitação para registrar a placa no backend via API.
     """
     api_url = "http://127.0.0.1:5000/yolo/register_car"
     headers = {"Content-Type": "application/json"}
-    data = {"license_plate": placa}
+    data = {"license_plate": placa,
+            "last_location": ipcamera}
     print(f"Enviando placa {placa} para API...")
     try:
         login_url = "http://127.0.0.1:5000/auth/login"
@@ -77,14 +78,15 @@ def registrar_placa_via_api(placa):
         print(f"Falha ao enviar placa para API: {e}")
         return False
     
-def registrar_local_via_api(placa, ipcamera):
+def registrar_local_via_api(placa, ip_camera):
     """
     Envia uma solicitação para registrar em qual camera a placa esta via API.
     """
-    api_url = "http://127.0.0.1:5000/yolo/register_car"
+    api_url = "http://127.0.0.1:5000/yolo/update_last_location"
     headers = {"Content-Type": "application/json"}
-    data = {"license_plate": placa}
-    print(f"Enviando placa {placa} para API...")
+    data = {"license_plate" : placa,
+            "last_location" : ip_camera}
+    print(f"Atualizando Local do veículo com placa {placa} na API...")
     try:
         login_url = "http://127.0.0.1:5000/auth/login"
         login_data = {"name": os.getenv("YOLO_USER"), "password": os.getenv("YOLO_PASS")}
@@ -99,7 +101,7 @@ def registrar_local_via_api(placa, ipcamera):
             print(f"Falha ao obter token de autenticação: {e}")
             return False
 
-        response = requests.post(api_url, json=data, headers=headers)
+        response = requests.patch(api_url, json=data, headers=headers)
         response.raise_for_status()
         print(f"API Response: {response.json()}")
         return True
@@ -107,9 +109,6 @@ def registrar_local_via_api(placa, ipcamera):
         print(f"Falha ao enviar placa para API: {e}")
         return False
     
-def enviar_localizacao_veiculo():
-    print("Veiculo placa XXXX na camera Y")
-
 def procurar_veiculo(placa, cameras_de_seguranca, placa_model, caracteres_model):
 
     while True:
@@ -128,6 +127,7 @@ def procurar_veiculo(placa, cameras_de_seguranca, placa_model, caracteres_model)
                         if placas_detectadas.get(placa) != ip_camera:
                             placas_detectadas[placa] = ip_camera
                             print(f'Placa {placa} AGORA está na câmera {ip_camera}')
+                            registrar_local_via_api(placa, ip_camera)
                     break
 
         time.sleep(2) 
@@ -238,7 +238,7 @@ def get_placas(ip_principal, lista_ip_webcam, placa_model, caracteres_model):
                                 placas_detectadas[placa_texto] = ip_principal
                                 print(f"Nova placa detectada: {placa_texto} na câmera {ip_principal}")
                                 
-                                registrar_placa_via_api(placa_texto)
+                                registrar_placa_via_api(placa_texto, ip_principal)
                                 
                                 threading.Thread(
                                     target=procurar_veiculo,
