@@ -16,11 +16,12 @@ def register_car():
     try:
         data = request.get_json()
         license_plate = data.get('license_plate')
+        last_location = data.get('last_location')
 
         if not license_plate:
             return DoResponse.bad_request("license_plate is required")
 
-        car = handle_register_car_movement(license_plate=license_plate)
+        car = handle_register_car_movement(license_plate=license_plate, last_location=last_location)
 
         message = f"Carro registrado: {car.license_plate}"
         q = get_message_queue()
