@@ -56,3 +56,24 @@ def get_all_unverified_plates():
 
     except Exception as e:
         raise PlateServiceError(f"Erro ao buscar placas não verificadas: {str(e)}", code=500)
+    
+def update_last_seen_in(license_plate, location):
+    try:
+        plate_check = PlateCheck.query.filter_by(license_plate=license_plate).first()
+
+        if not plate_check:
+            raise PlateServiceError(f"Placa '{license_plate}' não encontrada no banco de dados.", code=404)
+
+        plate_check.last_seen_in = location
+        db.session.commit()
+
+        return {
+            "license_plate": license_plate,
+            "last_seen_in": location
+        }
+
+    except PlateServiceError as e:
+        raise e 
+
+    except Exception as e:
+        raise PlateServiceError(f"Erro ao atualizar localização: {str(e)}", code=500)

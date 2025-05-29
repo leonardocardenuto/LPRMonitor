@@ -4,7 +4,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import ProtectedLayout from '../ProtectedLayout';
 import { useAuth } from '../../contexts/AuthContext';
 import axios from 'axios';
-import { fetchUnverifiedPlates } from './fetchIdentifyCars';
+import { fetchUnverifiedPlates, fetchCarAuthorization } from './fetchIdentifyCars';
 import { postIdentifyCar } from './services/IdentifyCarService';
 import useToast from '../../hooks/useToast';
 import { Button, CircularProgress } from '@mui/material';

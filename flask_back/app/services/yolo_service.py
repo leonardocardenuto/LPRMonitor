@@ -13,7 +13,7 @@ class CarServiceError(Exception):
         self.code = code
         super().__init__(message)
 
-def handle_register_car_movement(license_plate, owner_id=None, from_camera_id=None, to_camera_id=1):
+def handle_register_car_movement(license_plate, last_location, owner_id=None, from_camera_id=None, to_camera_id=1):
     if not license_plate:
         raise CarServiceError("license_plate is required", code=400)
 
@@ -45,6 +45,7 @@ def handle_register_car_movement(license_plate, owner_id=None, from_camera_id=No
         # 3. Se não existe em nenhum dos dois, cria temporário
         new_temp_car = PlateCheck(
             license_plate=license_plate,
+            last_seen_in=last_location
         )
         db.session.add(new_temp_car)
         db.session.flush()  # pegar o ID do carro antes do commit
