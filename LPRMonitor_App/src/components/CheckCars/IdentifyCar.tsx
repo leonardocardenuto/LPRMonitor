@@ -5,6 +5,11 @@ import ProtectedLayout from '../ProtectedLayout';
 import { useAuth } from '../../contexts/AuthContext';
 import axios from 'axios';
 import { fetchUnverifiedPlates } from './fetchIdentifyCars';
+import { postIdentifyCar } from './services/IdentifyCarService';
+import useToast from '../../hooks/useToast';
+import { Button, CircularProgress } from '@mui/material';
+import { handleUnauthorized } from '../../utils/authUtils';
+import { useNavigate } from 'react-router-dom';
 
 const statusOptions = [
   { value: 'student', label: 'Aluno' },
@@ -20,30 +25,58 @@ const IdentifyCar: React.FC = () => {
   const [expireDate, setExpireDate] = useState<Dayjs | null>(null);
   const [extraInfo, setExtraInfo] = useState('');
   const [justification, setJustification] = useState('');
-
+  const [loading, setLoading] = useState(false);
+  const toast = useToast(); 
+  const navigate = useNavigate();
+  
   const { logout } = useAuth();
 
     useEffect(() => {
       async function loadPlates() {
-        const data = await fetchUnverifiedPlates();
-        if (data && data.plates) {
-          setPlates(data.plates);
+        try {
+          const data = await fetchUnverifiedPlates();
+          if (data && data.plates) {
+            setPlates(data.plates);
+          }
+        } catch (error: any) {
+          if (axios.isAxiosError(error) && error.response && error.response.status === 401) {
+            handleUnauthorized(error, navigate);
+          }
         }
       }
-
       loadPlates();
-    }, []);
+    }, [navigate]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log({
-      plateName,
-      status,
-      expireDate: expireDate?.format('DD/MM/YYYY'),
-      extraInfo: (status === 'student' || status === 'familiars') ? extraInfo : null,
-      justification,
-    });
-  };
+    const handleSubmit = async (e: React.FormEvent) => {
+      setLoading(true);
+      e.preventDefault();
+    
+      try {
+        const payload = {
+          license_plate: plateName,
+          status,
+          extra_info: (status === 'student' || status === 'familiars') ? extraInfo : null,
+          expire_date: expireDate?.format('YYYY-MM-DD') || '', 
+          justification,
+        };
+    
+        await postIdentifyCar(payload);
+        
+        toast.success('Autorização gerada com sucesso!');
+        setPlateName('');
+        setStatus('');
+        setExpireDate(null);
+        setExtraInfo('');
+        setJustification('');
+        setLoading(false);
+      } catch (error: any) {
+        if (axios.isAxiosError(error) && error.response && error.response.status === 401) {
+          handleUnauthorized(error, navigate);
+        }
+        toast.error('Erro ao identificar veículo.');
+        setLoading(false);
+      }
+    };
 
   return (
     <ProtectedLayout onLogout={logout}>
@@ -126,12 +159,22 @@ const IdentifyCar: React.FC = () => {
           />
         </div>
 
-        <button
-          type="submit"
-          className="w-full bg-[#272932] hover:bg-[#5c6176] text-white py-2 rounded-md transition duration-200"
-        >
-          Submit
-        </button>
+        <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              size="large"
+              disabled={loading}
+              sx={{
+                mt: 3,
+                py: 1.5,
+                backgroundColor: '#1e40af',
+                borderRadius: 2,
+                '&:hover': { backgroundColor: '#1e3a8a' },
+              }}
+            >
+              {loading ? <CircularProgress size={24} color="inherit" /> : 'Criar Autorização'}
+        </Button>
       </form>
     </ProtectedLayout>
   );

@@ -3,7 +3,7 @@ from flask_cors import CORS
 from .config import Config
 from .extensions import db, jwt
 from .routes import register_routes
-from flask_jwt_extended import verify_jwt_in_request
+from flask_jwt_extended import verify_jwt_in_request, get_jwt
 from .utils.response_manager import ResponseManager as DoResponse
 
 def create_app():
@@ -40,6 +40,15 @@ def create_app():
             except Exception as e:
                 return DoResponse.unauthorized(message=str(e))
             return
+
+        if request.path.startswith('/identify_car/wipe-expired'):
+            try:
+                verify_jwt_in_request()
+                claims = get_jwt() 
+                if claims.get('name') != 'wipe-service':
+                    return DoResponse.unauthorized(message="Unauthorized user")
+            except Exception as e:
+                return DoResponse.unauthorized(message=str(e))
 
         try:
             if not request.headers.get("Authorization"):

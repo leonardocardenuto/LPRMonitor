@@ -4,6 +4,7 @@
 # CONFIGURAÇÕES INICIAIS
 # =============================
 
+FRONT_DIR="LPRMonitor_App"
 BACK_DIR="flask_back"
 BACK_DIR_ABS="$(realpath "$BACK_DIR")"
 YOLO_DIR="license_plate_detection"
@@ -120,6 +121,10 @@ run_app() {
   (cd "$BACK_DIR_ABS" && export PYTHONPATH="$BACK_DIR_ABS:$PYTHONPATH" && python "$script_name")
 }
 
+run_front() {
+  (cd "$FRONT_DIR" && npm run dev)
+}
+
 run_yolo() {
   activate_venv
   log_info "Rodando YOLO..."
@@ -175,6 +180,7 @@ set_flask_env
 # Roteia os comandos
 case "$1" in
   run) run_app ;;
+  run_front) run_front ;;
   yolo) run_yolo ;;
   migrate) migrate_db ;;
   routes) show_routes ;;

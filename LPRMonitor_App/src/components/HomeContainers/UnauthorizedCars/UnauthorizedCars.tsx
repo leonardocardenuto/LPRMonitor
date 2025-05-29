@@ -55,7 +55,6 @@ const UnauthorizedCarsTable: React.FC<UnauthorizedCarsTableProps> = ({ className
         const transformed = result.plates.map((item: any) => ({
           plate: item.license_plate,
           time: new Date(item.created_at).toLocaleString('pt-BR', {
-            timeZone: 'UTC',
             hour12: false,
           }),
           description: item.description,

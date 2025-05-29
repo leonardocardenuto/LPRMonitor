@@ -31,7 +31,10 @@ def login():
         user = authenticate(data['name'], data['password'])
         token = create_access_token(
             identity=str(user.id),
-            additional_claims={"login_time": datetime.utcnow().isoformat()}
+            additional_claims={
+            "login_time": datetime.utcnow().isoformat(),
+            "name": user.name
+            }
         )
         return DoResponse.success(data={"token": token})
     except AuthError as e:
