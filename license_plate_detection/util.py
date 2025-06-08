@@ -75,13 +75,24 @@ class APIClient:
             print(f"❌ Erro na autenticação: {e}")
 
     def registrar_placa(self, placa, ipcamera):
-        data = {"license_plate": placa, "last_location": ipcamera}
+        data = {"license_plate": placa, "camera_id": ipcamera}
         try:
             response = self.session.post(f"{self.base_url}/yolo/register_car", json=data)
             response.raise_for_status()
             print(f"✅ Placa {placa} registrada")
         except Exception as e:
             print(f"❌ Erro ao registrar placa {placa}: {e}")
+
+    def listar_cameras(self):
+        try:
+            response = self.session.get(f"{self.base_url}/yolo/list-all-cameras")
+            response.raise_for_status()
+            print(response.json())
+            cameras = response.json().get("cameras", [])
+            return cameras
+        except Exception as e:
+            print(f"❌ Erro ao listar câmeras: {e}")
+            return []
 
     def atualizar_local(self, placa, ipcamera):
         data = {"license_plate": placa, "last_location": ipcamera}
@@ -155,7 +166,11 @@ def procurar_veiculo(placa, cameras, placa_model, caracteres_model, api_client):
             time.sleep(2)
 
 
-def get_placas(ip_principal, lista_ip_webcam, placa_model, caracteres_model, api_client):
+def get_placas(cameras, placa_model, caracteres_model, api_client):
+    ip_principal = cameras[0]['camera_ip']
+    id_camera_principal = cameras[0]['id']
+    lista_ip_webcam = [camera['camera_ip'] for camera in cameras]
+
     cap = cv2.VideoCapture(f'http://{ip_principal}/video')
 
     if not cap.isOpened():
@@ -205,7 +220,7 @@ def get_placas(ip_principal, lista_ip_webcam, placa_model, caracteres_model, api
                             placas_detectadas[placa_texto] = ip_principal
                             print(f"✅ Nova placa detectada: {placa_texto} na câmera {ip_principal}")
 
-                            api_client.registrar_placa(placa_texto, ip_principal)
+                            api_client.registrar_placa(placa_texto, id_camera_principal)
 
                             threading.Thread(
                                 target=procurar_veiculo,
@@ -227,17 +242,15 @@ def get_placas(ip_principal, lista_ip_webcam, placa_model, caracteres_model, api
 
 
 if __name__ == "__main__":
-    lista_ip_webcam = os.getenv("LISTA_IP_WEBCAM", "").split(",")
-    ip_principal = os.getenv("IP_CAM")
-
     placa_model = YOLO('../yolo_model/plate_detection.pt')
     caracteres_model = YOLO('../yolo_model/character_detection.pt')
 
     api_client = APIClient()
+    cameras = api_client.listar_cameras()
 
     thread_get = threading.Thread(
         target=get_placas,
-        args=(ip_principal, lista_ip_webcam, placa_model, caracteres_model, api_client)
+        args=(cameras, placa_model, caracteres_model, api_client)
     )
 
     thread_get.start()

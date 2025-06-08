@@ -6,8 +6,8 @@ def get_sp_time():
     aware_time =    aware_time = datetime.now(timezone('America/Sao_Paulo'))   
     return aware_time.replace(tzinfo=None)
 
-class Car(db.Model):
-    __tablename__ = 'cars'
+class RegisteredCars(db.Model):
+    __tablename__ = 'registered_cars'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     license_plate = db.Column(db.String, nullable=False)
@@ -25,4 +25,4 @@ class Car(db.Model):
         }
 
     def __repr__(self):
-        return f"<Car id={self.id} license_plate='{self.license_plate}'>"
+        return f"<RegisteredCars id={self.id} license_plate='{self.license_plate}'>"

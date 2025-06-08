@@ -1,4 +1,4 @@
-from app.models.PlateCheck import PlateCheck
+from app.models.LastCars import LastCars
 from app.extensions import db
 from flask import jsonify
 
@@ -11,7 +11,7 @@ class PlateServiceError(Exception):
 def check_last_plate_exists():
     try:
         # Pegando o último registro
-        last_plate = PlateCheck.query.order_by(PlateCheck.created_at.desc()).first()
+        last_plate = LastCars.query.order_by(LastCars.created_at.desc()).first()
 
         # Se não houver placa no banco
         if not last_plate:
@@ -23,7 +23,7 @@ def check_last_plate_exists():
         # Verificando se a placa existe no banco (mesmo sabendo que ela já foi buscada)
         plate_str = last_plate.license_plate  # substitua por 'plate' se for esse o nome do campo
         exists = db.session.query(
-            PlateCheck.query.filter_by(license_plate=plate_str).exists()
+            LastCars.query.filter_by(license_plate=plate_str).exists()
         ).scalar()
 
         # Retornando para o front
@@ -37,7 +37,7 @@ def check_last_plate_exists():
 
 def get_last_plates():
     try:
-        plates = PlateCheck.query.order_by(PlateCheck.created_at.desc()).limit(10).all()
+        plates = LastCars.query.order_by(LastCars.created_at.desc()).limit(10).all()
         return [plate.to_dict() for plate in plates] 
     except Exception as e:
         raise PlateServiceError(f"Error retrieving plates: {str(e)}", code=500)
@@ -46,9 +46,9 @@ def get_all_unverified_plates():
     try:
         # Pegando todas as placas únicas com apenas 1 ocorrência (ou alguma lógica que defina 'não verificada')
         plates = (
-            db.session.query(PlateCheck.license_plate)
-            .group_by(PlateCheck.license_plate)
-            .having(db.func.count(PlateCheck.license_plate) == 1)
+            db.session.query(LastCars.license_plate)
+            .group_by(LastCars.license_plate)
+            .having(db.func.count(LastCars.license_plate) == 1)
             .all()
         )
 
@@ -59,7 +59,7 @@ def get_all_unverified_plates():
     
 def update_last_seen_in(license_plate, location):
     try:
-        plate_check = PlateCheck.query.filter_by(license_plate=license_plate).first()
+        plate_check = LastCars.query.filter_by(license_plate=license_plate).first()
 
         if not plate_check:
             raise PlateServiceError(f"Placa '{license_plate}' não encontrada no banco de dados.", code=404)

@@ -7,7 +7,7 @@ class Owner(db.Model):
     name = db.Column(db.String, nullable=False)
 
     # Optional: reverse relationship
-    cars = db.relationship('Car', backref='owner', cascade='all, delete-orphan')
+    cars = db.relationship('RegisteredCars', backref='owner', cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"<Owner id={self.id} name='{self.name}'>"

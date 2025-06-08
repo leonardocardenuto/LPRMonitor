@@ -1,5 +1,5 @@
 from app.models.IdentifyCar import IdentifyCar
-from app.models.PlateCheck import PlateCheck
+from app.models.LastCars import LastCars
 from app.extensions import db
 from datetime import datetime
 from pytz import timezone
@@ -17,7 +17,7 @@ class IdentifyCarServiceError(Exception):
 def identify_car_exists(license_plate):
     try:
         return db.session.query(
-            db.session.query(PlateCheck).filter_by(license_plate=license_plate).exists()
+            db.session.query(LastCars).filter_by(license_plate=license_plate).exists()
         ).scalar()
     except Exception as e:
         raise IdentifyCarServiceError(f"Erro ao verificar existência do carro: {str(e)}", code=500)

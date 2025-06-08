@@ -1,5 +1,5 @@
 from flask import Blueprint, request, current_app
-from app.services.yolo_service import handle_register_car_movement
+from app.services.yolo_service import handle_register_car_movement, get_all_cameras
 from app.services.plate_service import update_last_seen_in
 from app.utils.response_manager import ResponseManager as DoResponse
 import queue
@@ -11,24 +11,36 @@ def get_message_queue():
         current_app.message_queue = queue.Queue()
     return current_app.message_queue
 
+@yolo_bp.route('/list-all-cameras', methods=['GET'])
+def list_all_cameras():
+    try:
+        cameras = get_all_cameras()
+        if not cameras:
+            return DoResponse.not_found("No cameras found")
+
+        return DoResponse.success(data={"cameras": [camera.to_dict() for camera in cameras]})
+
+    except Exception as e:
+        return DoResponse.internal_server_error(str(e))
+
 @yolo_bp.route('/register_car', methods=['POST'])
 def register_car():
     try:
         data = request.get_json()
         license_plate = data.get('license_plate')
-        last_location = data.get('last_location')
+        camera_id = data.get('camera_id')
 
         if not license_plate:
             return DoResponse.bad_request("license_plate is required")
 
-        car = handle_register_car_movement(license_plate=license_plate, last_location=last_location)
+        car = handle_register_car_movement(license_plate=license_plate, camera_id=camera_id)
 
         message = f"Carro registrado: {car.license_plate}"
         q = get_message_queue()
         q.put(message)
 
         return DoResponse.created({
-            "message": "Car registered successfully",
+            "message": "RegisteredCars registered successfully",
             "car": car.to_dict()
         })
 
