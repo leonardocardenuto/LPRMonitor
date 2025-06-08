@@ -7,7 +7,7 @@ import {
   ColumnDef,
   SortingState,
 } from '@tanstack/react-table';
-import { fetchLastCars } from './services/LastCarsService';
+import { fetchLastCars, listAllCameras } from './services/LastCarsService';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from 'react-router-dom';
 import useToast from '../../../hooks/useToast';
@@ -18,8 +18,8 @@ import SwapVertIcon from '@mui/icons-material/SwapVert';
 
 interface LastCar {
   plate: string;
-  description: string;
-  time: string;
+  last_seen: string;
+  time: number;
 }
 
 interface LastCarsTableProps {
@@ -36,8 +36,8 @@ const columns: ColumnDef<LastCar>[] = [
     accessorKey: 'time',
   },
   {
-    header: 'Descrição',
-    accessorKey: 'description',
+    header: 'Visto Pela Última vez',
+    accessorKey: 'last_seen',
   },
 ];
 
@@ -51,13 +51,17 @@ const LastCarsTable: React.FC<LastCarsTableProps> = ({ updateTrigger }) => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const result = await fetchLastCars();
-        const transformed = result.plates.map((item: any) => ({
+        const result_plates = await fetchLastCars();
+        const result_cameras = await listAllCameras();
+        const cameraMap = new Map<number, string>(
+          result_cameras.cameras.map((camera: any) => [camera.id, camera.place])
+        );
+        const transformed = result_plates.plates.map((item: any) => ({
           plate: item.license_plate,
           time: new Date(item.created_at).toLocaleString('pt-BR', {
             hour12: false,
           }),
-          description: item.description,
+          last_seen: cameraMap.get(item.last_seen_in) || 'Local desconhecido',
         }));
         setData(transformed);
       } catch (error) {
