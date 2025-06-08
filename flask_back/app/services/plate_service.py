@@ -2,6 +2,8 @@ from app.models.LastCars import LastCars
 from app.extensions import db
 from flask import jsonify
 
+from app.models.RegisteredCars import RegisteredCars
+
 class PlateServiceError(Exception):
     def __init__(self, message, code=400):
         self.message = message
@@ -23,7 +25,7 @@ def check_last_plate_exists():
         # Verificando se a placa existe no banco (mesmo sabendo que ela já foi buscada)
         plate_str = last_plate.license_plate  # substitua por 'plate' se for esse o nome do campo
         exists = db.session.query(
-            LastCars.query.filter_by(license_plate=plate_str).exists()
+            RegisteredCars.query.filter_by(license_plate=plate_str).exists()
         ).scalar()
 
         # Retornando para o front
