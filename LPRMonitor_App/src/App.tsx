@@ -13,6 +13,7 @@ import IdentifyCar from './components/CheckCars/IdentifyCar';
 import Home from './components/Home';
 
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import RegisterCamera from './components/RegisterCamera/RegisterCamera';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isLoggedIn, loading } = useAuth();
@@ -49,6 +50,16 @@ const AppRoutes = () => (
         <PrivateRoute>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <IdentifyCar />
+          </LocalizationProvider>
+        </PrivateRoute>
+      }
+    />
+        <Route
+      path="/register-camera"
+      element={
+        <PrivateRoute>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <RegisterCamera />
           </LocalizationProvider>
         </PrivateRoute>
       }

@@ -168,9 +168,9 @@ const IdentifyCar: React.FC = () => {
               sx={{
                 mt: 3,
                 py: 1.5,
-                backgroundColor: '#1e40af',
+                backgroundColor: '#272932',
                 borderRadius: 2,
-                '&:hover': { backgroundColor: '#1e3a8a' },
+                '&:hover': { backgroundColor: '#4c5061' },
               }}
             >
               {loading ? <CircularProgress size={24} color="inherit" /> : 'Criar Autorização'}

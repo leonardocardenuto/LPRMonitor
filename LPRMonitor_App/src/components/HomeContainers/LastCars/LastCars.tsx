@@ -87,9 +87,9 @@ const LastCarsTable: React.FC<LastCarsTableProps> = ({ updateTrigger }) => {
   });
 
   return (
-    <div className="absolute top-0 right-0 w-5/12 h-1/2 bg-white shadow-xl rounded-2xl overflow-hidden">
-      <div className="p-4 border-b bg-gray-100 text-center">
-        <h2 className="text-lg font-semibold text-gray-800">Últimos Carros</h2>
+    <div className="absolute right-0 w-5/12 max-h-full bg-white shadow-xl rounded-2xl overflow-hidden">
+      <div className="p-4 border-b bg-[#272932] text-center">
+        <h2 className="text-lg font-semibold text-white">Últimos Carros</h2>
       </div>
       <div className="h-full overflow-auto">
         {loading ? (
@@ -98,7 +98,7 @@ const LastCarsTable: React.FC<LastCarsTableProps> = ({ updateTrigger }) => {
           </div>
         ) : (
           <table className="w-full table-auto" style={{ tableLayout: 'fixed' }}>
-            <thead className="bg-gray-100 sticky top-0 z-10">
+            <thead className="bg-[#272932] sticky top-0 z-10">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
@@ -106,7 +106,7 @@ const LastCarsTable: React.FC<LastCarsTableProps> = ({ updateTrigger }) => {
                     return (
                       <th
                         key={header.id}
-                        className="text-center px-4 py-3 border-b font-semibold text-gray-700 cursor-pointer select-none"
+                        className="text-center px-4 py-3 border-b font-semibold text-white cursor-pointer select-none"
                         onClick={header.column.getToggleSortingHandler()}
                       >
                         <div className="flex items-center justify-center gap-1">
@@ -134,7 +134,7 @@ const LastCarsTable: React.FC<LastCarsTableProps> = ({ updateTrigger }) => {
               {table.getRowModel().rows.map((row, i) => (
                 <tr
                   key={row.id}
-                  className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50 hover:bg-gray-100'}
+                  className={i % 2 === 0 ? 'bg-white' : 'bg-gray-100 hover:bg-gray-100'}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td

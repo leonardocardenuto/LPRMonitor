@@ -38,10 +38,6 @@ const Home: React.FC = () => {
       <Camera />
       <LastCars updateTrigger={updateCounter} />
       <NewPlate updateTrigger={updateCounter} />
-      <UnauthorizedCarsTable
-        updateTrigger={updateCounter}
-        className="bottom-0 right-0 absolute w-5/12 h-2/5"
-      />
     </ProtectedLayout>
   );
 };

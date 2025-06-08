@@ -11,15 +11,19 @@ const CheckUnauthorized: React.FC = () => {
 
   return (
     <ProtectedLayout onLogout={logout}>
-      <div className='flex justify-between items-center mb-8'>
-        <h1 className="text-2xl font-bold">Verificar veículos não autorizados</h1>
-        <button onClick={() => navigate('/check')}>
-          <FaPlus className='w-10 h-10' />
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold">Carros Não Autorizados</h1>
+        <button
+          onClick={() => navigate('/register-car')}
+          className="flex items-center bg-[#272932] text-white px-4 py-2 rounded hover:bg-[#4c5061] transition"
+        >
+          <FaPlus className="mr-2" />
+          Identificar Carro
         </button>
       </div>
       <UnauthorizedCarsTable />
     </ProtectedLayout>
-  );
+  );  
 };
 
 export default CheckUnauthorized;

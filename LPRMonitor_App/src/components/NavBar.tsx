@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaCar, FaHome, FaInfoCircle } from 'react-icons/fa';
+import { FaCamera, FaCameraRetro, FaCar, FaHome, FaInfoCircle } from 'react-icons/fa';
 import logo from '../assets/logo_white.png';
 import { motion } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -54,11 +54,11 @@ const NavBar: React.FC<NavBarProps> = ({ onLogout }) => {
           <div className="space-y-6 ml-2 mt-6">
             <button onClick={() => navigate('/')}>
               <div className="flex items-center space-x-4">
-                <FaHome className={`w-8 h-8 ${location.pathname === '/' ? 'text-blue-500' : ''}`} />
+                <FaHome className={`w-8 h-8 ${location.pathname === '/' ? 'text-[#8594d8]' : ''}`} />
                 <span
                   className={`transition-opacity duration-300 font-bold ${
                     menuOpen ? 'opacity-100' : 'opacity-0'
-                  } ${location.pathname === '/' ? 'text-blue-500' : ''}`}
+                  } ${location.pathname === '/' ? 'text-[#8594d8]' : ''}`}
                 >
                   Home
                 </span>
@@ -66,13 +66,25 @@ const NavBar: React.FC<NavBarProps> = ({ onLogout }) => {
             </button>
             <button onClick={() => navigate('/check-unauthorized')}>
               <div className="flex items-center space-x-4">
-                <FaCar className={`w-8 h-8 ${location.pathname === '/check-unauthorized' ? 'text-blue-500' : ''}`} />
+                <FaCar className={`w-8 h-8 ${location.pathname === '/check-unauthorized' ? 'text-[#8594d8]' : ''}`} />
                 <span
                   className={`transition-opacity duration-300 font-bold ${
                     menuOpen ? 'opacity-100' : 'opacity-0'
-                  } ${location.pathname === '/check-unauthorized' ? 'text-blue-500' : ''}`}
+                  } ${location.pathname === '/check-unauthorized' ? 'text-[#8594d8]' : ''}`}
                 >
                   Usuário
+                </span>
+              </div>
+            </button>
+            <button onClick={() => navigate('/register-camera')}>
+              <div className="flex items-center space-x-4">
+                <FaCameraRetro className={`w-8 h-8 ${location.pathname === '/register-camera' ? 'text-[#8594d8]' : ''}`} />
+                <span
+                  className={`transition-opacity duration-300 font-bold ${
+                    menuOpen ? 'opacity-100' : 'opacity-0'
+                  } ${location.pathname === '/register-camera' ? 'text-[#8594d8]' : ''}`}
+                >
+                  Registrar
                 </span>
               </div>
             </button>

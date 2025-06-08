@@ -84,8 +84,8 @@ const UnauthorizedCarsTable: React.FC<UnauthorizedCarsTableProps> = ({ className
 
   return (
     <div className={`bg-white shadow-xl rounded-2xl overflow-hidden ${className}`}>
-      <div className="p-4 border-b bg-gray-100 text-center">
-        <h2 className="text-lg font-semibold text-gray-800">Últimos Carros Não Autorizados</h2>
+      <div className="p-4 border-b bg-[#272932] text-center">
+        <h2 className="text-lg font-semibold text-white">Últimos Carros Não Autorizados</h2>
       </div>
       <div className="h-full overflow-auto">
         {loading ? (
@@ -94,7 +94,7 @@ const UnauthorizedCarsTable: React.FC<UnauthorizedCarsTableProps> = ({ className
           </div>
         ) : (
           <table className="w-full table-auto" style={{ tableLayout: 'fixed' }}>
-            <thead className="bg-gray-100 sticky top-0 z-10">
+            <thead className="bg-[#272932] sticky top-0 z-10">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
@@ -102,7 +102,7 @@ const UnauthorizedCarsTable: React.FC<UnauthorizedCarsTableProps> = ({ className
                     return (
                       <th
                         key={header.id}
-                        className="text-center px-4 py-3 border-b font-semibold text-gray-700 cursor-pointer select-none"
+                        className="text-center px-4 py-3 border-b font-semibold text-white cursor-pointer select-none"
                         onClick={header.column.getToggleSortingHandler()}
                       >
                         <div className="flex items-center justify-center gap-1">
