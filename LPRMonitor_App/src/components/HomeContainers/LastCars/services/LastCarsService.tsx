@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const API_URL_fetch_cars = 'http://localhost:5000/check_plate/get_last_plates'; 
 const API_URL_list_cameras = 'http://localhost:5000/yolo/list-all-cameras'
+const API_URL_fetch_unverified_cars = 'http://localhost:5000/check_plate/unverified_plates'
 
 export const fetchLastCars = async () => {
     try {
@@ -13,7 +14,7 @@ export const fetchLastCars = async () => {
         });
         return response.data;
     } catch (error) {
-        console.error('Error fetching last cars:', error);
+        console.error('Error fetching unverified cars:', error);
         throw error;
     }
 };
@@ -29,6 +30,21 @@ export const listAllCameras = async () => {
         return response.data;
     } catch (error) {
         console.error('Error fetching cameras:', error);
+        throw error;
+    }
+};
+
+export const fetchNonRegisteredCars = async () => {
+    try {
+        const token = localStorage.getItem('token'); 
+        const response = await axios.get(`${API_URL_fetch_unverified_cars}`, {
+            headers: {
+                Authorization: `Bearer ${token}`, 
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching non registered cars:', error);
         throw error;
     }
 };

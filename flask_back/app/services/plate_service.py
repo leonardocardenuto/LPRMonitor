@@ -1,5 +1,7 @@
 from app.models.LastCars import LastCars
+from app.models.RegisteredCars import RegisteredCars
 from app.extensions import db
+from sqlalchemy import func
 from flask import jsonify
 
 class PlateServiceError(Exception):
@@ -44,19 +46,25 @@ def get_last_plates():
     
 def get_all_unverified_plates():
     try:
-        # Pegando todas as placas únicas com apenas 1 ocorrência (ou alguma lógica que defina 'não verificada')
+        # Subquery para placas registradas
+        registered_subquery = (
+            db.session.query(RegisteredCars.license_plate)
+            .subquery()
+        )
+
+        # Consulta principal
         plates = (
             db.session.query(LastCars.license_plate)
+            .filter(~LastCars.license_plate.in_(registered_subquery))  # placas que NÃO estão registradas
             .group_by(LastCars.license_plate)
-            .having(db.func.count(LastCars.license_plate) == 1)
+            .having(func.count(LastCars.license_plate) == 1)  # aparecem só uma vez
             .all()
         )
 
         return [plate[0] for plate in plates]
 
     except Exception as e:
-        raise PlateServiceError(f"Erro ao buscar placas não verificadas: {str(e)}", code=500)
-    
+        raise PlateServiceError(f"Erro ao buscar placas não verificadas: {str(e)}", code=500) 
 def update_last_seen_in(license_plate, location):
     try:
         plate_check = LastCars.query.filter_by(license_plate=license_plate).first()

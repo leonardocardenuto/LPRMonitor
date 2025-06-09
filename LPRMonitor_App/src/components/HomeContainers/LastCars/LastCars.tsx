@@ -7,7 +7,7 @@ import {
   ColumnDef,
   SortingState,
 } from '@tanstack/react-table';
-import { fetchLastCars, listAllCameras } from './services/LastCarsService';
+import { fetchLastCars, listAllCameras, fetchNonRegisteredCars } from './services/LastCarsService';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from 'react-router-dom';
 import useToast from '../../../hooks/useToast';
@@ -20,6 +20,7 @@ interface LastCar {
   plate: string;
   last_seen: string;
   time: number;
+  autorized: string;
 }
 
 interface LastCarsTableProps {
@@ -27,6 +28,10 @@ interface LastCarsTableProps {
 }
 
 const columns: ColumnDef<LastCar>[] = [
+  {
+    header: 'Autorizado',
+    accessorKey : 'autorized'
+  },
   {
     header: 'Placa',
     accessorKey: 'plate',
@@ -53,15 +58,18 @@ const LastCarsTable: React.FC<LastCarsTableProps> = ({ updateTrigger }) => {
       try {
         const result_plates = await fetchLastCars();
         const result_cameras = await listAllCameras();
+        const result_unatorized_cars = await fetchNonRegisteredCars();
         const cameraMap = new Map<number, string>(
           result_cameras.cameras.map((camera: any) => [camera.id, camera.place])
         );
+        const unauthorizedPlates = result_unatorized_cars.plates || [];
         const transformed = result_plates.plates.map((item: any) => ({
           plate: item.license_plate,
           time: new Date(item.created_at).toLocaleString('pt-BR', {
             hour12: false,
           }),
           last_seen: cameraMap.get(item.last_seen_in) || 'Local desconhecido',
+          autorized: unauthorizedPlates.includes(item.license_plate) ? '❌' : '✅',
         }));
         setData(transformed);
       } catch (error) {
