@@ -14,6 +14,7 @@ import Home from './components/Home';
 
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import RegisterCamera from './components/RegisterCamera/RegisterCamera';
+import PageWrapper from './PageWrapper';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isLoggedIn, loading } = useAuth();
