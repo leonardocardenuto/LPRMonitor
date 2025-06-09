@@ -1,6 +1,6 @@
 from app.models.RegisteredCars import RegisteredCars
 from app.models.LastCars import LastCars
-from app.models.Cameras import Cameras
+from app.models.Camera import Camera
 
 from app.extensions import db
 from datetime import datetime

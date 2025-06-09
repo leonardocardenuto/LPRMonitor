@@ -1,7 +1,7 @@
 from ..extensions import db
 from datetime import datetime
 
-class Cameras(db.Model):
+class Camera(db.Model):
     __tablename__ = 'cameras'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -16,4 +16,4 @@ class Cameras(db.Model):
         }
 
     def __repr__(self):
-        return f"<Cameras id={self.id} camera_ip='{self.camera_ip}' place='{self.place}'>"
+        return f"<Camera id={self.id} camera_ip='{self.camera_ip}' place='{self.place}'>"
