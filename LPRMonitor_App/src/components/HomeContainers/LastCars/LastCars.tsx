@@ -99,7 +99,7 @@ const LastCarsTable: React.FC<LastCarsTableProps> = ({ updateTrigger }) => {
   });
 
   return (
-    <div className="absolute right-0 w-5/12 max-h-full bg-white shadow-xl rounded-2xl overflow-hidden">
+    <div className="absolute right-0 w-5/12 h-full bg-white shadow-xl rounded-2xl overflow-hidden">
       <div className="p-4 border-b bg-[#272932] text-center">
         <h2 className="text-lg font-semibold text-white">Últimos Carros</h2>
       </div>

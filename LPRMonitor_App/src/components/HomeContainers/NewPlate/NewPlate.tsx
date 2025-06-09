@@ -66,11 +66,11 @@ const NewPlate: React.FC<NewPlateProps> = ({ updateTrigger }) => {
 
     return (
         <motion.div
-          className="absolute bottom-0 left-0 w-1/2 h-2/5 bg-white flex flex-col justify-evenly"
+          className="absolute bottom-0 left-0 w-1/2 h-2/5 rounded-2xl bg-white flex flex-col justify-evenly"
           variants={shakeVariant}
           animate={triggerAnimation ? 'shake' : ''}
         >
-            <div className='bg-blue-600 w-full h-1/6 border-t-2 border-l-2 border-r-2 border-black items-center flex justify-center text-[white] font-bold'>
+            <div className='bg-blue-600 w-full h-1/6 border-t-2 rounded-t-2xl border-l-2 border-r-2 border-black items-center flex justify-center text-[white] font-bold'>
                 <h3>Instituto Mauá de Tecnologia</h3>
             </div>
 
@@ -79,7 +79,7 @@ const NewPlate: React.FC<NewPlateProps> = ({ updateTrigger }) => {
             </div>
 
             <div
-                className={`w-full h-1/3 flex justify-center items-center text-[black] text-[48px] font-bold ${
+                className={`w-full h-1/3 flex justify-center items-center rounded-b-2xl text-[black] text-[48px] font-bold ${
                     plateExists ? 'bg-green-400' : 'bg-red-400'
                 }`}
             >

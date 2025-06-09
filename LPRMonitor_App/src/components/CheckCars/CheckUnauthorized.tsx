@@ -14,7 +14,7 @@ const CheckUnauthorized: React.FC = () => {
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Carros Não Autorizados</h1>
         <button
-          onClick={() => navigate('/register-car')}
+          onClick={() => navigate('/check')}
           className="flex items-center bg-[#272932] text-white px-4 py-2 rounded hover:bg-[#4c5061] transition"
         >
           <FaPlus className="mr-2" />
