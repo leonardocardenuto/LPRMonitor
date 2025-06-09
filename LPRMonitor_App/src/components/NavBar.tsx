@@ -54,35 +54,35 @@ const NavBar: React.FC<NavBarProps> = ({ onLogout }) => {
           <div className="space-y-6 ml-2 mt-6">
             <button onClick={() => navigate('/')}>
               <div className="flex items-center space-x-4">
-                <FaHome className={`w-8 h-8 ${location.pathname === '/' ? 'text-[#8594d8]' : ''}`} />
+                <FaHome className={`w-8 h-8 ${location.pathname === '/' ? 'text-[#8963BA]' : ''}`} />
                 <span
                   className={`transition-opacity duration-300 font-bold ${
                     menuOpen ? 'opacity-100' : 'opacity-0'
-                  } ${location.pathname === '/' ? 'text-[#8594d8]' : ''}`}
+                  } ${location.pathname === '/' ? 'text-[#8963BA]' : ''}`}
                 >
-                  Home
+                  Início
                 </span>
               </div>
             </button>
             <button onClick={() => navigate('/check-unauthorized')}>
               <div className="flex items-center space-x-4">
-                <FaCar className={`w-8 h-8 ${location.pathname === '/check-unauthorized' ? 'text-[#8594d8]' : ''}`} />
+                <FaCar className={`w-8 h-8 ${location.pathname === '/check-unauthorized' ? 'text-[#8963BA]' : ''}`} />
                 <span
                   className={`transition-opacity duration-300 font-bold ${
                     menuOpen ? 'opacity-100' : 'opacity-0'
-                  } ${location.pathname === '/check-unauthorized' ? 'text-[#8594d8]' : ''}`}
+                  } ${location.pathname === '/check-unauthorized' ? 'text-[#8963BA]' : ''}`}
                 >
-                  Usuário
+                  Verificar
                 </span>
               </div>
             </button>
             <button onClick={() => navigate('/register-camera')}>
               <div className="flex items-center space-x-4">
-                <FaCameraRetro className={`w-8 h-8 ${location.pathname === '/register-camera' ? 'text-[#8594d8]' : ''}`} />
+                <FaCameraRetro className={`w-8 h-8 ${location.pathname === '/register-camera' ? 'text-[#8963BA]' : ''}`} />
                 <span
                   className={`transition-opacity duration-300 font-bold ${
                     menuOpen ? 'opacity-100' : 'opacity-0'
-                  } ${location.pathname === '/register-camera' ? 'text-[#8594d8]' : ''}`}
+                  } ${location.pathname === '/register-camera' ? 'text-[#8963BA]' : ''}`}
                 >
                   Registrar
                 </span>
