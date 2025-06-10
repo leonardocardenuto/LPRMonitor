@@ -5,11 +5,13 @@ from .extensions import db, jwt
 from .routes import register_routes
 from flask_jwt_extended import verify_jwt_in_request, get_jwt
 from .utils.response_manager import ResponseManager as DoResponse
+from datetime import timedelta
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=90)
+    
     CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
     db.init_app(app)
     jwt.init_app(app)

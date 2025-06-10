@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProtectedLayout from '../ProtectedLayout';
 import { useAuth } from '../../contexts/AuthContext';
-import axios from 'axios';
 import useToast from '../../hooks/useToast';
 import { Button, CircularProgress } from '@mui/material';
-import { handleUnauthorized } from '../../utils/authUtils';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { createCamera, getAllCameras, updateCamera } from './services/CameraService';
 
 const RegisterCamera: React.FC = () => {
     const [tab, setTab] = useState(0);
@@ -16,38 +15,71 @@ const RegisterCamera: React.FC = () => {
     const [editCameraIp, setEditCameraIp] = useState('');
     const [editDescription, setEditDescription] = useState('');
     const [loading, setLoading] = useState(false);
+    const [cameras, setCameras] = useState<{ id: string; camera_ip: string; place: string }[]>([]);
     const toast = useToast();
     const navigate = useNavigate();
     const { logout } = useAuth();
 
-    const cameras = [
-        { id: '1', ip: '192.168.0.10', description: 'Entrada' },
-        { id: '2', ip: '192.168.0.11', description: 'Saída' },
-    ];
+    useEffect(() => {
+        const fetchCameras = async () => {
+            try {
+                const response = await getAllCameras();
+                setCameras(Array.isArray(response.cameras) ? response.cameras : []);
+            } catch {
+                toast.error('Erro ao buscar câmeras');
+            }
+        };
+        fetchCameras();
+    }, []);
 
-    const handleEditClick = (camera: { id: string; ip: string; description: string }) => {
-        setEditCameraId(camera.id);
-        setEditCameraIp(camera.ip);
-        setEditDescription(camera.description);
-    };
-
-    const handleRegisterSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        setLoading(false);
+    const handleEditClick = (camera: { id: string; camera_ip: string; place: string }) => {
+        setEditCameraId(String(camera.id));
+        setEditCameraIp(camera.camera_ip);
+        setEditDescription(camera.place);
     };
 
     const handleEditSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setLoading(false);
+        try {
+            await updateCamera(Number(editCameraId), {
+                camera_ip: editCameraIp,
+                place: editDescription,
+            });
+            toast.success('Câmera atualizada com sucesso!');
+            setEditCameraId('');
+            setEditCameraIp('');
+            setEditDescription('');
+            const updated = await getAllCameras();
+            setCameras(Array.isArray(updated.cameras) ? updated.cameras : []);
+        } catch {
+            toast.error('Erro ao atualizar câmera');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleRegisterSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            await createCamera({ camera_ip: cameraIp, place: description });
+            toast.success('Câmera registrada com sucesso!');
+            setCameraIp('');
+            setDescription('');
+            const updated = await getAllCameras();
+            setCameras(Array.isArray(updated.cameras) ? updated.cameras : []);
+        } catch {
+            toast.error('Erro ao registrar câmera');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const tabs = ['Adicionar Câmera', 'Editar Câmera'];
 
     return (
         <ProtectedLayout onLogout={logout}>
-            {/* Tabs personalizadas */}
             <div className="w-full mt-4 flex justify-center">
                 <div className="flex bg-zinc-100 p-1 rounded-xl shadow-inner">
                     {tabs.map((t, index) => (
@@ -64,7 +96,6 @@ const RegisterCamera: React.FC = () => {
                 </div>
             </div>
 
-            {/* Conteúdo animado */}
             <AnimatePresence mode="wait">
                 {tab === 0 ? (
                     <motion.div
@@ -74,10 +105,7 @@ const RegisterCamera: React.FC = () => {
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.3 }}
                     >
-                        <form
-                            onSubmit={handleRegisterSubmit}
-                            className="w-auto mx-auto mt-10 p-6 rounded-2xl"
-                        >
+                        <form onSubmit={handleRegisterSubmit} className="w-auto mx-auto mt-10 p-6 rounded-2xl">
                             <h2 className="text-2xl font-semibold mb-4 text-center">Registrar Câmera</h2>
                             <div className="mb-4 shadow-md bg-white rounded-md p-4">
                                 <label className="block text-gray-700 mb-1">IP da Câmera *</label>
@@ -132,8 +160,8 @@ const RegisterCamera: React.FC = () => {
                                 <select
                                     className="w-full border border-gray-300 rounded-md px-3 py-2 mb-4"
                                     value={editCameraId}
-                                    onChange={e => {
-                                        const cam = cameras.find(c => c.id === e.target.value);
+                                    onChange={(e) => {
+                                        const cam = cameras.find(c => String(c.id) === e.target.value);
                                         if (cam) handleEditClick(cam);
                                         else {
                                             setEditCameraId('');
@@ -145,7 +173,7 @@ const RegisterCamera: React.FC = () => {
                                     <option value="">Selecione...</option>
                                     {cameras.map(cam => (
                                         <option key={cam.id} value={cam.id}>
-                                            {cam.description} ({cam.ip})
+                                            {cam.place} ({cam.camera_ip})
                                         </option>
                                     ))}
                                 </select>
