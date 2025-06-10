@@ -42,7 +42,7 @@ const Camera: React.FC = () => {
         <>
           <div className="relative w-full h-full">
             <img
-              src={`http://${currentCam.camera_ip}/video`}
+              src={`http://${currentCam.camera_ip}:8080/video`}
               alt={`Câmera em ${currentCam.place}`}
               className="w-full h-full object-cover rounded-2xl"
               onError={() => setError('Não foi possível carregar a câmera.')}

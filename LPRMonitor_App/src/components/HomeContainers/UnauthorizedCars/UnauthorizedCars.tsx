@@ -27,7 +27,7 @@ const columns: ColumnDef<UnauthorizedCar>[] = [
     accessorKey: 'plate',
   },
   {
-    header: 'Hora da Detecção',
+    header: 'Data de Entrada',
     accessorKey: 'time',
   },
   {

@@ -69,8 +69,12 @@ const RegisterCamera: React.FC = () => {
             setDescription('');
             const updated = await getAllCameras();
             setCameras(Array.isArray(updated.cameras) ? updated.cameras : []);
-        } catch {
-            toast.error('Erro ao registrar câmera');
+        } catch (error: any){
+            if (error.response && error.status == 409){
+                toast.error('Erro ao registrar: câmera ja registrada')
+            }
+            else {toast.error('Erro ao registrar câmera');
+            }
         } finally {
             setLoading(false);
         }

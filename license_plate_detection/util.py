@@ -103,7 +103,7 @@ class APIClient:
             print(f"❌ Erro ao atualizar localização da placa {placa}: {e}")
 
 def verificar_camera(ip_webcam, placa_model, caracteres_model):
-    cap = cv2.VideoCapture(f'http://{ip_webcam}/video')
+    cap = cv2.VideoCapture(f'http://{ip_webcam}:8080/video')
     if not cap.isOpened():
         return False
 
@@ -173,10 +173,10 @@ def procurar_veiculo(placa, cameras, jsoncameras, placa_model, caracteres_model,
 
 
 def get_placas(cameras, placa_model, caracteres_model, api_client):
-    id_camera_principal = cameras[-1]['id']
+    id_camera_principal = cameras[0]['id']
     lista_ip_webcam = [camera['camera_ip'] for camera in cameras]
 
-    cap = cv2.VideoCapture(f'http://{cameras[-1]['camera_ip']}/video')
+    cap = cv2.VideoCapture(f'http://{cameras[0]['camera_ip']}:8080/video')
 
     if not cap.isOpened():
         print("❌ Não foi possível abrir a câmera principal.")

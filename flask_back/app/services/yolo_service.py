@@ -36,6 +36,6 @@ def handle_register_car_movement(license_plate, owner_id=None, camera_id=None):
 
 def get_all_cameras():
     try:
-        return Camera.query.all()
+        return Camera.query.order_by(Camera.id).all()
     except Exception as e:
         raise CarServiceError(f"Error fetching cameras: {str(e)}", code=500)

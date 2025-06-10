@@ -37,7 +37,7 @@ const columns: ColumnDef<LastCar>[] = [
     accessorKey: 'plate',
   },
   {
-    header: 'Hora da Detecção',
+    header: 'Data de Entrada',
     accessorKey: 'time',
   },
   {
