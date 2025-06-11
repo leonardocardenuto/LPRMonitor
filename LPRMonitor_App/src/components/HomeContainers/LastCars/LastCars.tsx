@@ -19,7 +19,7 @@ import SwapVertIcon from '@mui/icons-material/SwapVert';
 interface LastCar {
   plate: string;
   last_seen: string;
-  time: number;
+  time: string;
   autorized: string;
 }
 
@@ -30,7 +30,7 @@ interface LastCarsTableProps {
 const columns: ColumnDef<LastCar>[] = [
   {
     header: 'Autorizado',
-    accessorKey : 'autorized'
+    accessorKey: 'autorized',
   },
   {
     header: 'Placa',
@@ -48,9 +48,11 @@ const columns: ColumnDef<LastCar>[] = [
 
 const LastCarsTable: React.FC<LastCarsTableProps> = ({ updateTrigger }) => {
   const [data, setData] = useState<LastCar[]>([]);
+  const [oldData, setOldData] = useState<LastCar[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
+  const toast = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,18 +61,29 @@ const LastCarsTable: React.FC<LastCarsTableProps> = ({ updateTrigger }) => {
         const result_plates = await fetchLastCars();
         const result_cameras = await listAllCameras();
         const result_registered_cars = await fetchRegiteredCars();
+
         const cameraMap = new Map<number, string>(
           result_cameras.cameras.map((camera: any) => [camera.id, camera.place])
         );
-        console.log(result_registered_cars);
+
         const transformed = result_plates.plates.map((item: any) => ({
           plate: item.license_plate,
-          time: new Date(item.created_at).toLocaleString('pt-BR', {
-            hour12: false,
-          }),
+          time: new Date(item.created_at).toLocaleString('pt-BR', { hour12: false }),
           last_seen: cameraMap.get(item.last_seen_in) || 'Local desconhecido',
           autorized: result_registered_cars.plates.includes(item.license_plate) ? '✅' : '❌',
         }));
+
+        const oldPlates = new Set(oldData.map(car => car.plate));
+        const newPlates = new Set(transformed.map((car: { plate: any; }) => car.plate));
+        const removed = [...oldPlates].filter(plate => !newPlates.has(plate));
+
+        if (removed.length > 0) {
+          removed.forEach(plate => {
+            toast.info(`Carro ${plate} saiu do monitoramento`);
+          });
+        }
+
+        setOldData(transformed);
         setData(transformed);
       } catch (error) {
         if (
