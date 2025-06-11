@@ -8,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import numpy as np
 import requests
 from dotenv import load_dotenv
+import re 
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '..', 'flask_back', '.env')
 load_dotenv(dotenv_path)
@@ -101,28 +102,39 @@ class APIClient:
             print(f"✅ Localização da placa {placa} atualizada para {ipcamera}")
         except Exception as e:
             print(f"❌ Erro ao atualizar localização da placa {placa}: {e}")
+    
+    def deletar_veiculo(self, placa):
+        try:
+            data = {"license_plate": placa}
+            response = self.session.delete(f"{self.base_url}/yolo/delete_exiting_car", json=data)
+            response.raise_for_status()
+            print(f"🏁 Saída do veículo {placa} confirmada")
+        except Exception as e:
+            print(f"❌ Erro ao confirmar saída do veiculo com placa {placa}: {e}")
+        
 
-def verificar_camera(ip_webcam, placa_model, caracteres_model):
+def verificar_camera(ip_webcam, placa_model, caracteres_model, target_plate: str) -> bool:
     cap = cv2.VideoCapture(f'http://{ip_webcam}:8080/video')
     if not cap.isOpened():
         return False
 
     ret, frame = cap.read()
     cap.release()
-
     if not ret:
         return False
 
     placas_result = placa_model(frame, verbose=False)
-
     for r in placas_result:
         boxes = r.boxes.xyxy.cpu().numpy()
         classes = r.boxes.cls.cpu().numpy()
+        confiancas = r.boxes.conf.cpu().numpy()
 
-        for box, cls_idx in zip(boxes, classes):
+        for box, cls_idx, conf in zip(boxes, classes, confiancas):
+            if conf < 0.8:
+                continue
+
             x1, y1, x2, y2 = map(int, box)
             class_name = placa_model.model.names[int(cls_idx)]
-
             placa_crop = frame[y1:y2, x1:x2]
             if placa_crop.size == 0:
                 continue
@@ -132,21 +144,21 @@ def verificar_camera(ip_webcam, placa_model, caracteres_model):
                 {'label': caracteres_model.model.names[int(c[5])], 'x1': c[0], 'score': c[4]}
                 for c in caracteres_result.boxes.data.tolist()
             ]
-
             caracteres_ordenados = sorted(caracteres_detectados, key=lambda c: c['x1'])
-            placa_texto = ''.join([c['label'] for c in caracteres_ordenados])
+            placa_texto = corrigir_formato(''.join([c['label'] for c in caracteres_ordenados]), class_name)
 
-            if all(c['score'] >= 0.85 for c in caracteres_ordenados):
+            if placa_texto == target_plate and all(c['score'] >= 0.85 for c in caracteres_ordenados):
                 return True
 
     return False
+
 
 
 def procurar_veiculo(placa, cameras, jsoncameras, placa_model, caracteres_model, api_client):
     with ThreadPoolExecutor(max_workers=len(cameras)) as executor:
         while True:
             futures = {
-                executor.submit(verificar_camera, ip, placa_model, caracteres_model): ip
+                executor.submit(verificar_camera, ip, placa_model, caracteres_model, placa): ip
                 for ip in cameras
             }
 
@@ -156,17 +168,23 @@ def procurar_veiculo(placa, cameras, jsoncameras, placa_model, caracteres_model,
 
                 if encontrado:
                     with lock:
-                        # Garantimos que estamos atualizando apenas a placa monitorada
                         if placas_detectadas.get(placa) != ip_camera:
                             for camera in jsoncameras:
                                 if camera['camera_ip'] == ip_camera:
-                                    camera_id = camera['id']
-                                    local_camera = camera['place']
-                                    placas_detectadas[placa] = ip_camera
-                                    print(f"🚗 Placa {placa} agora está na câmera: {local_camera}")
-                                    api_client.atualizar_local(placa, camera_id)
-                    break  # Interrompe o loop de verificação após encontrar
-
+                                    print(placas_detectadas)
+                                    if re.match(r'^\s*saída\s*$|^\s*sai[^\s]*\s*$', camera['place'], re.IGNORECASE): #Verifica se a camera é uma saida 
+                                        api_client.deletar_veiculo(placa)
+                                        print(f"antes: {placas_detectadas}")
+                                        placas_detectadas.pop(placa) 
+                                        print(f"depois: {placas_detectadas}")       
+                                                             
+                                    else:
+                                        camera_id = camera['id']
+                                        local_camera = camera['place']
+                                        placas_detectadas[placa] = ip_camera
+                                        print(f"🚗 Placa {placa} agora está na câmera: {local_camera}")
+                                        api_client.atualizar_local(placa, camera_id)
+                    break  
             time.sleep(2)
 
 
@@ -181,7 +199,6 @@ def get_placas(cameras, placa_model, caracteres_model, api_client):
     if not cap.isOpened():
         print("❌ Não foi possível abrir a câmera principal.")
         return
-
     while True:
         ret, frame = cap.read()
         if not ret:
@@ -222,8 +239,8 @@ def get_placas(cameras, placa_model, caracteres_model, api_client):
                 if validar_formato(placa_texto, class_name) and all(c['score'] >= 0.85 for c in caracteres_ordenados):
                     with lock:
                         if placa_texto not in placas_detectadas:
-                            placas_detectadas[placa_texto] = cameras[-1]['camera_ip']
-                            print(f"✅ Nova placa detectada: {placa_texto} na câmera: {cameras[-1]['place']}")
+                            placas_detectadas[placa_texto] = cameras[0]['camera_ip']
+                            print(f"✅ Nova placa detectada: {placa_texto} na câmera: {cameras[0]['place']}")
                             api_client.registrar_placa(placa_texto, id_camera_principal)
 
                             threading.Thread(

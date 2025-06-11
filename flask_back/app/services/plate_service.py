@@ -41,7 +41,7 @@ def check_last_plate_exists():
 
 def get_last_plates():
     try:
-        plates = LastCars.query.order_by(LastCars.created_at.desc()).limit(10).all()
+        plates = LastCars.query.order_by(LastCars.created_at.desc()).limit(100).all()
         return [plate.to_dict() for plate in plates] 
     except Exception as e:
         raise PlateServiceError(f"Error retrieving plates: {str(e)}", code=500)

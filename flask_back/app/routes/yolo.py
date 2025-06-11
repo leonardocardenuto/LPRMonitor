@@ -1,5 +1,5 @@
 from flask import Blueprint, request, current_app
-from app.services.yolo_service import handle_register_car_movement, get_all_cameras
+from app.services.yolo_service import handle_register_car_movement, get_all_cameras, handle_delete_car
 from app.services.plate_service import update_last_seen_in
 from app.utils.response_manager import ResponseManager as DoResponse
 import queue
@@ -76,6 +76,29 @@ def update_last_location():
 
         return DoResponse.success(message={
             "message": "Localization Updated successfully",
+            "car": car
+        })
+
+    except Exception as e:
+        return DoResponse.internal_server_error(str(e))
+
+@yolo_bp.route('/delete_exiting_car', methods=['DELETE'])
+def delete_exiting_car():
+    try:
+        data = request.get_json()
+        license_plate = data.get('license_plate')
+
+        if not license_plate:
+            return DoResponse.bad_request("license_plate is required")
+
+        car = handle_delete_car(license_plate=license_plate)
+        
+        message = f"Carro Deletado: {car['deleted']}"
+        q = get_message_queue()
+        q.put(message)
+
+        return DoResponse.success(message={
+            "message": "Car deleted successfully",
             "car": car
         })
 
