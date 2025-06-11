@@ -7,6 +7,7 @@ const YOLO_API_URL = 'http://localhost:5000/yolo';
 export const createCamera = async (data: {
     camera_ip: string;
     place: string;
+    active: boolean;
 }) => {
     try {
         const token = localStorage.getItem('token');
@@ -27,6 +28,7 @@ export const updateCamera = async (
     data: {
         camera_ip?: string;
         place?: string;
+        active?: boolean;
     }
 ) => {
     try {
@@ -43,13 +45,18 @@ export const updateCamera = async (
     }
 };
 
-export const getAllCameras = async () => {
+export const getAllCameras = async (justActive?: boolean) => {
     try {
         const token = localStorage.getItem('token');
+        const params: Record<string, any> = {};
+        if (typeof justActive === 'boolean') {
+            params.justActive = justActive;
+        }
         const response = await axios.get(`${YOLO_API_URL}/list-all-cameras`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
+            params,
         });
         return response.data;
     } catch (error) {

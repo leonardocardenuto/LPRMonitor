@@ -12,7 +12,7 @@ interface UnauthorizedCar {
 }
 
 interface NewPlateProps {
-  updateTrigger?: number;  // optional trigger to re-check plate
+  updateTrigger?: number; 
 }
 
 const NewPlate: React.FC<NewPlateProps> = ({ updateTrigger }) => {
@@ -31,7 +31,6 @@ const NewPlate: React.FC<NewPlateProps> = ({ updateTrigger }) => {
                 if (response && response.plate !== undefined) {
                     setNewPlate(response.plate);
                     setPlateExists(response.exists);
-                    console.log("oi");
                 } else {
                     setNewPlate(null);
                     setPlateExists(false);
@@ -47,12 +46,12 @@ const NewPlate: React.FC<NewPlateProps> = ({ updateTrigger }) => {
         };
 
         checkPlate();
-    }, [updateTrigger]);// <-- dependency added here
+    }, [updateTrigger]);
 
     useEffect(() => {
         if (plateExists === false) {
             setTriggerAnimation(true);
-            const timer = setTimeout(() => setTriggerAnimation(false), 1000); // animation 1s
+            const timer = setTimeout(() => setTriggerAnimation(false), 1000);
             return () => clearTimeout(timer);
         }
     }, [plateExists]);

@@ -14,9 +14,20 @@ def get_message_queue():
 @yolo_bp.route('/list-all-cameras', methods=['GET'])
 def list_all_cameras():
     try:
-        cameras = get_all_cameras()
+        just_active_param = request.args.get('justActive')
+        if just_active_param is not None:
+            if just_active_param.lower() in ['true', '1']:
+                justActive = True
+            elif just_active_param.lower() in ['false', '0']:
+                justActive = False
+            else:
+                return DoResponse.bad_request("Invalid value for 'justActive' parameter")
+        else:
+            justActive = True
+
+        cameras = get_all_cameras(justActive=justActive)
         if not cameras:
-            return DoResponse.not_found("No cameras found")
+            return DoResponse.success(data={"cameras": []}, message="No cameras found")
 
         return DoResponse.success(data={"cameras": [camera.to_dict() for camera in cameras]})
 

@@ -7,14 +7,17 @@ const Camera: React.FC = () => {
   const [cameras, setCameras] = useState<{ id: string; camera_ip: string; place: string }[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCameras = async () => {
       try {
         const response = await getAllCameras();
         setCameras(Array.isArray(response.cameras) ? response.cameras : []);
+        setLoading(false);
       } catch {
         setError('Erro ao buscar câmeras.');
+        setLoading(false);
       }
     };
     fetchCameras();
@@ -36,8 +39,10 @@ const Camera: React.FC = () => {
     <div className="absolute top-0 left-0 w-1/2 h-1/2 bg-white flex flex-col justify-center items-center rounded-2xl p-4 shadow-lg">
       {error ? (
         <p className="text-[16px] text-[#888]">{error}</p>
-      ) : cameras.length === 0 ? (
+      ) : loading ? (
         <p className="text-[16px] text-[#888]">Carregando câmeras...</p>
+      ) : cameras.length === 0 ? (
+        <p className="text-[16px] text-[#888]">Não há câmeras ativas cadastradas.</p>
       ) : (
         <>
           <div className="relative w-full h-full">

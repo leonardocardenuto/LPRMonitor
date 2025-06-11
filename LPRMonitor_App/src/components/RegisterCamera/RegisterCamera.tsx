@@ -11,11 +11,13 @@ const RegisterCamera: React.FC = () => {
     const [tab, setTab] = useState(0);
     const [cameraIp, setCameraIp] = useState('');
     const [description, setDescription] = useState('');
+    const [active, setActive] = useState(true);
     const [editCameraId, setEditCameraId] = useState('');
     const [editCameraIp, setEditCameraIp] = useState('');
     const [editDescription, setEditDescription] = useState('');
+    const [editActive, setEditActive] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [cameras, setCameras] = useState<{ id: string; camera_ip: string; place: string }[]>([]);
+    const [cameras, setCameras] = useState<{ id: string; camera_ip: string; place: string; active: boolean }[]>([]);
     const toast = useToast();
     const navigate = useNavigate();
     const { logout } = useAuth();
@@ -23,7 +25,7 @@ const RegisterCamera: React.FC = () => {
     useEffect(() => {
         const fetchCameras = async () => {
             try {
-                const response = await getAllCameras();
+                const response = await getAllCameras(false);
                 setCameras(Array.isArray(response.cameras) ? response.cameras : []);
             } catch {
                 toast.error('Erro ao buscar câmeras');
@@ -32,10 +34,11 @@ const RegisterCamera: React.FC = () => {
         fetchCameras();
     }, []);
 
-    const handleEditClick = (camera: { id: string; camera_ip: string; place: string }) => {
+    const handleEditClick = (camera: { id: string; camera_ip: string; place: string; active?: boolean }) => {
         setEditCameraId(String(camera.id));
         setEditCameraIp(camera.camera_ip);
         setEditDescription(camera.place);
+        setEditActive(camera.active ?? true);
     };
 
     const handleEditSubmit = async (e: React.FormEvent) => {
@@ -45,11 +48,13 @@ const RegisterCamera: React.FC = () => {
             await updateCamera(Number(editCameraId), {
                 camera_ip: editCameraIp,
                 place: editDescription,
+                active: editActive,
             });
             toast.success('Câmera atualizada com sucesso!');
             setEditCameraId('');
             setEditCameraIp('');
             setEditDescription('');
+            setEditActive(true);
             const updated = await getAllCameras();
             setCameras(Array.isArray(updated.cameras) ? updated.cameras : []);
         } catch {
@@ -63,17 +68,18 @@ const RegisterCamera: React.FC = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            await createCamera({ camera_ip: cameraIp, place: description });
+            await createCamera({ camera_ip: cameraIp, place: description, active: active });
             toast.success('Câmera registrada com sucesso!');
             setCameraIp('');
             setDescription('');
+            setActive(true);
             const updated = await getAllCameras();
             setCameras(Array.isArray(updated.cameras) ? updated.cameras : []);
-        } catch (error: any){
-            if (error.response && error.status == 409){
-                toast.error('Erro ao registrar: câmera ja registrada')
-            }
-            else {toast.error('Erro ao registrar câmera');
+        } catch (error: any) {
+            if (error.response && error.status == 409) {
+                toast.error('Erro ao registrar: câmera ja registrada');
+            } else {
+                toast.error('Erro ao registrar câmera');
             }
         } finally {
             setLoading(false);
@@ -118,7 +124,7 @@ const RegisterCamera: React.FC = () => {
                                     value={cameraIp}
                                     onChange={(e) => setCameraIp(e.target.value)}
                                     required
-                                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#272932]"
+                                    className="w-full border border-gray-300 rounded-md px-3 py-2"
                                 />
                             </div>
                             <div className="mb-4 shadow-md bg-white rounded-md p-4">
@@ -128,8 +134,19 @@ const RegisterCamera: React.FC = () => {
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
                                     required
-                                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#272932]"
+                                    className="w-full border border-gray-300 rounded-md px-3 py-2"
                                 />
+                            </div>
+                            <div className="mb-4 shadow-md bg-white rounded-md p-4">
+                                <label className="block text-gray-700 mb-1">Ativo</label>
+                                <input
+                                    type="checkbox"
+                                    checked={active}
+                                    onChange={(e) => setActive(e.target.checked)}
+                                    className="mr-2"
+                                    disabled
+                                />
+                                <span>{active ? 'Sim' : 'Não'}</span>
                             </div>
                             <Button
                                 type="submit"
@@ -171,13 +188,14 @@ const RegisterCamera: React.FC = () => {
                                             setEditCameraId('');
                                             setEditCameraIp('');
                                             setEditDescription('');
+                                            setEditActive(true);
                                         }
                                     }}
                                 >
                                     <option value="">Selecione...</option>
                                     {cameras.map(cam => (
                                         <option key={cam.id} value={cam.id}>
-                                            {cam.place} ({cam.camera_ip})
+                                            {cam.place} ({cam.camera_ip}) {cam.active ? '(Ativa)' : '(Inativa)'}
                                         </option>
                                     ))}
                                 </select>
@@ -191,7 +209,7 @@ const RegisterCamera: React.FC = () => {
                                             value={editCameraIp}
                                             onChange={(e) => setEditCameraIp(e.target.value)}
                                             required
-                                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#272932]"
+                                            className="w-full border border-gray-300 rounded-md px-3 py-2"
                                         />
                                     </div>
                                     <div className="mb-4 shadow-md bg-white rounded-md p-4">
@@ -201,8 +219,18 @@ const RegisterCamera: React.FC = () => {
                                             value={editDescription}
                                             onChange={(e) => setEditDescription(e.target.value)}
                                             required
-                                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#272932]"
+                                            className="w-full border border-gray-300 rounded-md px-3 py-2"
                                         />
+                                    </div>
+                                    <div className="mb-4 shadow-md bg-white rounded-md p-4">
+                                        <label className="block text-gray-700 mb-1">Ativo</label>
+                                        <input
+                                            type="checkbox"
+                                            checked={editActive}
+                                            onChange={(e) => setEditActive(e.target.checked)}
+                                            className="mr-2 focus:outline-none focus:ring-0"
+                                        />
+                                        <span>{editActive ? 'Sim' : 'Não'}</span>
                                     </div>
                                     <Button
                                         type="submit"
