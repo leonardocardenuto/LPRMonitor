@@ -63,7 +63,6 @@ const createWindow = async () => {
     try {
       await waitForServer('http://localhost:5173');
       await mainWindow.loadURL('http://localhost:5173'); // Vite dev server
-      mainWindow.webContents.openDevTools();
     } catch (e) {
       console.error('Failed to load dev server:', e);
       app.quit();
