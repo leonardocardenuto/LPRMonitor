@@ -129,8 +129,12 @@ class APIClient:
     
 def verificar_camera(ip_webcam, placa_model, caracteres_model, target_plate: str) -> bool:
     cap = cv2.VideoCapture(f'http://{ip_webcam}:8080/video')
+    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
     if not cap.isOpened():
         return False
+    for _ in range(5):  # Descarte 5 frames antigos
+        cap.grab()
+
 
     ret, frame = cap.read()
     cap.release()
@@ -207,6 +211,7 @@ def get_placas(cameras, placa_model, caracteres_model, api_client):
     lista_ip_webcam = [camera['camera_ip'] for camera in cameras]
 
     cap = cv2.VideoCapture(f'http://{cameras[0]["camera_ip"]}:8080/video')
+    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
     if not cap.isOpened():
         print("❌ Não foi possível abrir a câmera principal.")
@@ -223,6 +228,9 @@ def get_placas(cameras, placa_model, caracteres_model, api_client):
                 cameras_monitoradas.add(ip)
 
     while True:
+        for _ in range(5):  # Descarte 5 frames antigos
+            cap.grab()
+            
         ret, frame = cap.read()
         if not ret:
             print("❌ Falha ao capturar frame.")
@@ -264,7 +272,6 @@ def get_placas(cameras, placa_model, caracteres_model, api_client):
                             print(f"✅ Nova placa detectada: {placa_texto} na câmera: {cameras[0]['place']}")
                             api_client.registrar_placa(placa_texto, id_camera_principal)
 
-                        # Inicia threads para cada câmera, se ainda não iniciadas
                         for ip in lista_ip_webcam:
                             if ip not in cameras_monitoradas:
                                 threading.Thread(
