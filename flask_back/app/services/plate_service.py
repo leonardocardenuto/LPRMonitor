@@ -67,6 +67,19 @@ def get_all_unverified_plates():
 
     except Exception as e:
         raise PlateServiceError(f"Erro ao buscar placas não verificadas: {str(e)}", code=500) 
+    
+def get_all_registered_plates():
+    try:
+        plates = (
+            db.session.query(RegisteredCars.license_plate)
+            
+        )
+
+        return [plate[0] for plate in plates]
+
+    except Exception as e:
+        raise PlateServiceError(f"Erro ao buscar placas autorizadas: {str(e)}", code=500) 
+    
 def update_last_seen_in(license_plate, location):
     try:
         plate_check = LastCars.query.filter_by(license_plate=license_plate).first()
