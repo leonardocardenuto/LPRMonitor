@@ -15,6 +15,8 @@ load_dotenv(dotenv_path)
 
 placas_detectadas = {}
 lock = threading.Lock()
+cameras_monitoradas = set()
+
 
 
 
@@ -108,11 +110,23 @@ class APIClient:
             data = {"license_plate": placa}
             response = self.session.delete(f"{self.base_url}/yolo/delete_exiting_car", json=data)
             response.raise_for_status()
-            print(f"🏁 Saída do veículo {placa} confirmada")
+            print(f"🚩 Saída do veículo {placa} confirmada")
         except Exception as e:
             print(f"❌ Erro ao confirmar saída do veiculo com placa {placa}: {e}")
-        
+            
+    def listar_veiculos(self):
+        try:
+            response = self.session.get(f"{self.base_url}/check_plate/get_last_plates")
+            response.raise_for_status()
+            placas_data = response.json()  
+                    
+            return placas_data
+        except Exception as e:
+            print(f"❌ Erro ao resgatar lista de veiculos: {e}")
+            return {}
 
+
+    
 def verificar_camera(ip_webcam, placa_model, caracteres_model, target_plate: str) -> bool:
     cap = cv2.VideoCapture(f'http://{ip_webcam}:8080/video')
     if not cap.isOpened():
@@ -154,38 +168,36 @@ def verificar_camera(ip_webcam, placa_model, caracteres_model, target_plate: str
 
 
 
-def procurar_veiculo(placa, cameras, jsoncameras, placa_model, caracteres_model, api_client):
-    with ThreadPoolExecutor(max_workers=len(cameras)) as executor:
-        while True:
-            futures = {
-                executor.submit(verificar_camera, ip, placa_model, caracteres_model, placa): ip
-                for ip in cameras
-            }
+def monitorar_camera(ip_camera, jsoncameras, placa_model, caracteres_model, api_client):
+    while True:
+        with lock:
+            placas_em_monitoramento = list(placas_detectadas.keys())
+            print(placas_em_monitoramento)
 
-            for future in as_completed(futures):
-                ip_camera = futures[future]
-                encontrado = future.result()
+        for placa in placas_em_monitoramento:
+            encontrado = verificar_camera(ip_camera, placa_model, caracteres_model, placa)
 
-                if encontrado:
-                    with lock:
-                        if placas_detectadas.get(placa) != ip_camera:
-                            for camera in jsoncameras:
-                                if camera['camera_ip'] == ip_camera:
-                                    print(placas_detectadas)
-                                    if re.match(r'^\s*saída\s*$|^\s*sai[^\s]*\s*$', camera['place'], re.IGNORECASE): #Verifica se a camera é uma saida 
-                                        api_client.deletar_veiculo(placa)
-                                        print(f"antes: {placas_detectadas}")
-                                        placas_detectadas.pop(placa) 
-                                        print(f"depois: {placas_detectadas}")       
-                                                             
-                                    else:
-                                        camera_id = camera['id']
-                                        local_camera = camera['place']
-                                        placas_detectadas[placa] = ip_camera
-                                        print(f"🚗 Placa {placa} agora está na câmera: {local_camera}")
-                                        api_client.atualizar_local(placa, camera_id)
-                    break  
-            time.sleep(2)
+            if encontrado:
+                with lock:
+                    if placas_detectadas.get(placa) != ip_camera:
+                        print("Veículo trocando de câmera")
+                        for camera in jsoncameras:
+                            if camera['camera_ip'] == ip_camera:
+                                if re.match(r'^\s*saída\s*$|^\s*sai[^\s]*\s*$', camera['place'], re.IGNORECASE): 
+                                    api_client.deletar_veiculo(placa)
+                                    print(f"antes: {placas_detectadas}")
+                                    placas_detectadas.pop(placa) 
+                                    print(f"depois: {placas_detectadas}")       
+                                else:
+                                    camera_id = camera['id']
+                                    local_camera = camera['place']
+                                    print(f"antes: {placas_detectadas}")
+                                    placas_detectadas[placa] = ip_camera
+                                    print(f"🚗 Placa {placa} agora está na câmera: {local_camera}")
+                                    api_client.atualizar_local(placa, camera_id)
+                                    print(f"depois: {placas_detectadas}")
+        time.sleep(2)
+
 
 
 
@@ -194,11 +206,22 @@ def get_placas(cameras, placa_model, caracteres_model, api_client):
     id_camera_principal = cameras[0]['id']
     lista_ip_webcam = [camera['camera_ip'] for camera in cameras]
 
-    cap = cv2.VideoCapture(f'http://{cameras[0]['camera_ip']}:8080/video')
+    cap = cv2.VideoCapture(f'http://{cameras[0]["camera_ip"]}:8080/video')
 
     if not cap.isOpened():
         print("❌ Não foi possível abrir a câmera principal.")
         return
+    
+    with lock:
+        for ip in lista_ip_webcam:
+            if ip not in cameras_monitoradas:
+                threading.Thread(
+                    target=monitorar_camera,
+                    args=(ip, cameras, placa_model, caracteres_model, api_client),
+                    daemon=True
+                ).start()
+                cameras_monitoradas.add(ip)
+
     while True:
         ret, frame = cap.read()
         if not ret:
@@ -206,7 +229,6 @@ def get_placas(cameras, placa_model, caracteres_model, api_client):
             break
 
         frame = cv2.resize(frame, (960, 540))
-
         placas_result = placa_model(frame, verbose=False)
 
         for r in placas_result:
@@ -222,7 +244,6 @@ def get_placas(cameras, placa_model, caracteres_model, api_client):
                 class_name = placa_model.model.names[int(cls_idx)]
 
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-
                 placa_crop = frame[y1:y2, x1:x2]
                 if placa_crop.size == 0:
                     continue
@@ -243,11 +264,15 @@ def get_placas(cameras, placa_model, caracteres_model, api_client):
                             print(f"✅ Nova placa detectada: {placa_texto} na câmera: {cameras[0]['place']}")
                             api_client.registrar_placa(placa_texto, id_camera_principal)
 
-                            threading.Thread(
-                                target=procurar_veiculo,
-                                args=(placa_texto, lista_ip_webcam, cameras, placa_model, caracteres_model, api_client),
-                                daemon=True
-                            ).start()
+                        # Inicia threads para cada câmera, se ainda não iniciadas
+                        for ip in lista_ip_webcam:
+                            if ip not in cameras_monitoradas:
+                                threading.Thread(
+                                    target=monitorar_camera,
+                                    args=(ip, cameras, placa_model, caracteres_model, api_client),
+                                    daemon=True
+                                ).start()
+                                cameras_monitoradas.add(ip)
 
                     cv2.putText(frame, placa_texto, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX,
                                 0.9, (0, 255, 0), 2)
@@ -260,14 +285,21 @@ def get_placas(cameras, placa_model, caracteres_model, api_client):
     cv2.destroyAllWindows()
 
 
-
+api_client = APIClient()
+cameras = api_client.listar_cameras()
+mapa_cameras = {camera["id"]: camera["camera_ip"] for camera in cameras}
+placas_anterior = api_client.listar_veiculos()
+placas_detectadas = {
+placa["license_plate"]: mapa_cameras.get(placa["last_seen_in"])
+for placa in placas_anterior["plates"]
+if mapa_cameras.get(placa["last_seen_in"]) is not None
+}
 
 if __name__ == "__main__":
     placa_model = YOLO('../yolo_model/plate_detection.pt')
     caracteres_model = YOLO('../yolo_model/character_detection.pt')
 
-    api_client = APIClient()
-    cameras = api_client.listar_cameras()
+    print(f"Testando placa: {placas_detectadas}")
 
     thread_get = threading.Thread(
         target=get_placas,
