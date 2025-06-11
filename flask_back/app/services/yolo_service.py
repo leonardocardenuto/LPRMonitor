@@ -34,8 +34,11 @@ def handle_register_car_movement(license_plate, owner_id=None, camera_id=None):
         db.session.rollback()
         raise CarServiceError(f"Error processing car and movement: {str(e)}", code=500)
 
-def get_all_cameras():
+def get_all_cameras(justActive=True):
     try:
-        return Camera.query.order_by(Camera.id).all()
+        query = Camera.query
+        if justActive:
+            query = query.filter_by(justActive=True)
+        return query.order_by(Camera.id).all()
     except Exception as e:
         raise CarServiceError(f"Error fetching cameras: {str(e)}", code=500)
