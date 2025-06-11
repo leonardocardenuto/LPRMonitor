@@ -38,7 +38,7 @@ def get_all_cameras(justActive=True):
     try:
         query = Camera.query
         if justActive:
-            query = query.filter_by(justActive=True)
+            query = query.filter_by(active=True)
         return query.order_by(Camera.id).all()
     except Exception as e:
         raise CarServiceError(f"Error fetching cameras: {str(e)}", code=500)
